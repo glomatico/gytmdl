@@ -251,16 +251,16 @@ if __name__ == '__main__':
         '--u',
         '--usecookie',
         action='store_true',
-        help='Use "cookies.txt" file present at the same directory as this script to download tracks.',
+        help='Use cookie file named "cookies.txt" located at the current directory of this script to download tracks.',
     )
     parser.add_argument(
         "--f",
         "--format",
         choices=['141', '251', '140'],
         default='140',
-        help='141 (AAC 256kbps), 251 (Opus 160kbps) or 140 (AAC 128kbps). Requires a YouTube Music Premium "cookies.txt'
-             '" file present at the same directory as this script.'
-             'for 141. Default is 140.',
+        help='141 (AAC 256kbps), 251 (Opus 160kbps) or 140 (AAC 128kbps). A YouTube Music Premium cookie file named '
+             '"cookies.txt" located at the current directory of this script is required to download format 141 tracks. '
+             'Default format is 140',
     )
     parser.add_argument(
         '--e',
