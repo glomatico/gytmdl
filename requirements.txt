@@ -1,0 +1,6 @@
+yt-dlp
+ytmusicapi
+requests
+mutagen
+music-tag
+Pillow
