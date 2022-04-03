@@ -1,6 +1,6 @@
 """
 Glomatico's YouTube Music Downloader
-A Python script to download YouTube Music tracks.
+ Python script to download YouTube Music tracks with YouTube Music tags.
 """
 
 import yt_dlp
