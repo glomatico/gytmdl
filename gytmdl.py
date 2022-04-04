@@ -168,7 +168,7 @@ def get_ydl_opts(track_download_directory, download_format, use_cookie):
 
 def download_track(ydl_opts, video_id):
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        ydl.download('youtu.be/' + video_id)
+        ydl.download('music.youtube.com/watch?v=' + video_id)
 
 
 def apply_tags(track_download_directory, download_format, exclude_tags, tags):
@@ -323,13 +323,20 @@ if __name__ == '__main__':
     if not video_id:
         exit('No valid URL entered.')
     for i in range(len(video_id)):
-        print(f'Getting tags ({str(i + 1)} of {str(len(video_id))})...')
-        tags = get_tags(video_id[i], artwork_size)
-        print(f'Downloading "{tags["track_title"]}" ({str(i + 1)} of {str(len(video_id))})...')
-        track_download_directory = get_track_download_directory(download_format, tags)
-        ydl_opts = get_ydl_opts(track_download_directory, download_format, use_cookie)
-        download_track(ydl_opts, video_id[i])
-        apply_tags(track_download_directory, download_format, exclude_tags, tags)
-        if artwork_save:
-            save_artwork(tags)
-        print(f'Download finished ({str(i + 1)} of {str(len(video_id))})!')
+        try:
+            print(f'Getting tags ({str(i + 1)} of {str(len(video_id))})...')
+            tags = get_tags(video_id[i], artwork_size)
+            print(f'Downloading "{tags["track_title"]}" ({str(i + 1)} of {str(len(video_id))})...')
+            track_download_directory = get_track_download_directory(download_format, tags)
+            ydl_opts = get_ydl_opts(track_download_directory, download_format, use_cookie)
+            download_track(ydl_opts, video_id[i])
+            apply_tags(track_download_directory, download_format, exclude_tags, tags)
+            if artwork_save:
+                save_artwork(tags)
+            print(f'Download finished ({str(i + 1)} of {str(len(video_id))})!')
+        except KeyboardInterrupt:
+            exit()
+        except:
+            print(f'* Download failed ({str(i + 1)} of {str(len(video_id))}).')
+            error_count += 1
+    print(f'All done ({error_count} error(s)).')
