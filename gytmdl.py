@@ -247,19 +247,19 @@ if __name__ == '__main__':
         'url',
         help='Download YouTube Music track/album/playlist.',
         nargs='+',
-        metavar='<url>'
+        metavar='<url1> <url2> <ur3> ...'
     )
     parser.add_argument(
         '--u',
         '--usecookie',
         action='store_true',
-        help='Use cookie file named "cookies.txt" located at the current directory to download songs.',
+        help='Use "cookies.txt" file.',
     )
     parser.add_argument(
         "--f",
         "--downloadformat",
         default='140',
-        help='Set download format. Valid download formats are 128 (128kbps AAC .m4a), 251 (128bps Opus .opus) and 141 (256kbps AAC .m4a).',
+        help='Set download format. Valid download formats are 128 (128kbps AAC m4a), 251 (128bps Opus opus) and 141 (256kbps AAC m4a).',
         metavar='<download format>'
     )
     parser.add_argument(
