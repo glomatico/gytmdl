@@ -1,8 +1,3 @@
-"""
-Glomatico's YouTube Music Downloader
-A Python script to download YouTube Music tracks with YouTube Music tags.
-"""
-
 import yt_dlp
 from ytmusicapi import YTMusic
 import requests
@@ -21,63 +16,60 @@ def get_video_id(url):
         'no_warnings': True,
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        url_details = ydl.extract_info(
+        ydl_extracted_info = ydl.extract_info(
             url,
             download=False,
         )
-    if 'youtube' in url_details['extractor']:
-        if 'MPREb' in url_details['webpage_url_basename']:
+    if 'youtube' in ydl_extracted_info['extractor']:
+        if 'MPREb' in ydl_extracted_info['webpage_url_basename']:
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                url_details = ydl.extract_info(
-                    url_details['url'],
+                ydl_extracted_info = ydl.extract_info(
+                    ydl_extracted_info['url'],
                     download=False,
                 )
-        if 'playlist' in url_details['webpage_url_basename']:
+        if 'playlist' in ydl_extracted_info['webpage_url_basename']:
             video_id = []
-            for i in range(len(url_details['entries'])):
-                video_id.append(url_details['entries'][i]['id'])
+            for i in range(len(ydl_extracted_info['entries'])):
+                video_id.append(ydl_extracted_info['entries'][i]['id'])
             return video_id
-        if 'watch' in url_details['webpage_url_basename']:
-            return [url_details['id']]
-    raise
-
-
-ytmusic = YTMusic()
+        if 'watch' in ydl_extracted_info['webpage_url_basename']:
+            return [ydl_extracted_info['id']]
 
 
 def get_tags(video_id, artwork_size):
-    watch_playlist = ytmusic.get_watch_playlist(video_id)
-    album_details = ytmusic.get_album(watch_playlist['tracks'][0]['album']['id'])
-    album = album_details['title']
+    ytmusic = YTMusic()
+    ytmusic_watch_playlist = ytmusic.get_watch_playlist(video_id)
+    ytmusic_album_details = ytmusic.get_album(ytmusic_watch_playlist['tracks'][0]['album']['id'])
+    album = ytmusic_album_details['title']
     album_fixed = album
-    if len(album_details['artists']) == 1:
-        album_artist = album_details['artists'][0]['name']
+    if len(ytmusic_album_details['artists']) == 1:
+        album_artist = ytmusic_album_details['artists'][0]['name']
     else:
         album_artist_temp = []
-        for a in range(len(album_details['artists'])):
-            album_artist_temp.append(album_details['artists'][a]['name'])
+        for a in range(len(ytmusic_album_details['artists'])):
+            album_artist_temp.append(ytmusic_album_details['artists'][a]['name'])
         album_artist = ", ".join(album_artist_temp[:-1])
         album_artist += " & " + album_artist_temp[-1]
     album_artist_fixed = album_artist
-    if len(watch_playlist['tracks'][0]['artists']) == 1:
-        artist = watch_playlist['tracks'][0]['artists'][0]['name']
+    if len(ytmusic_watch_playlist['tracks'][0]['artists']) == 1:
+        artist = ytmusic_watch_playlist['tracks'][0]['artists'][0]['name']
     else:
         artist_temp = []
-        for a in range(len(watch_playlist['tracks'][0]['artists'])):
-            artist_temp.append(watch_playlist['tracks'][0]['artists'][a]['name'])
+        for a in range(len(ytmusic_watch_playlist['tracks'][0]['artists'])):
+            artist_temp.append(ytmusic_watch_playlist['tracks'][0]['artists'][a]['name'])
         artist = ", ".join(artist_temp[:-1])
         artist += " & " + artist_temp[-1]
     artist_fixed = artist
-    artwork = requests.get(album_details['thumbnails'][0]['url'].split('=')[0] + '=w' + artwork_size).content
+    artwork = requests.get(ytmusic_album_details['thumbnails'][0]['url'].split('=')[0] + '=w' + artwork_size).content
     try:
-        lyrics_id = ytmusic.get_lyrics(watch_playlist['lyrics'])
+        lyrics_id = ytmusic.get_lyrics(ytmusic_watch_playlist['lyrics'])
         lyrics = lyrics_id['lyrics']
     except:
         lyrics = None
     rating = 0
     track_number = 0
     track_number_fixed = 00
-    total_tracks = album_details['trackCount']
+    total_tracks = ytmusic_album_details['trackCount']
     ydl_opts = {
         'extract_flat': True,
         'skip_download': True,
@@ -85,22 +77,22 @@ def get_tags(video_id, artwork_size):
         'no_warnings': True,
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        album_playlist_details = ydl.extract_info(
+        ydl_extracted_playlist_info = ydl.extract_info(
             'https://www.youtube.com/playlist?list='
-            + album_details['audioPlaylistId'],
+            + ytmusic_album_details['audioPlaylistId'],
             download=False,
         )
-    for i in range(len(album_playlist_details['entries'])):
-        if album_playlist_details['entries'][i]['id'] == video_id:
-            if album_details['tracks'][i]['isExplicit']:
+    for i in range(len(ydl_extracted_playlist_info['entries'])):
+        if ydl_extracted_playlist_info['entries'][i]['id'] == video_id:
+            if ytmusic_album_details['tracks'][i]['isExplicit']:
                 rating = 4
             else:
                 rating = 0
             track_number = 1 + i
             track_number_fixed = '%02d' % (1 + i)
-    track_title = watch_playlist['tracks'][0]['title']
+    track_title = ytmusic_watch_playlist['tracks'][0]['title']
     track_title_fixed = track_title
-    year = album_details['year']
+    year = ytmusic_album_details['year']
     illegal_characters = ['\\', '/', ':', '*', '?', '"', '<', '>', '|']
     for a in range(len(illegal_characters)):
         album_artist_fixed = album_artist_fixed.replace(illegal_characters[a], '_')
@@ -131,20 +123,26 @@ def get_tags(video_id, artwork_size):
     }
 
 
-def get_track_download_directory(download_format, tags):
+def get_track_download_directory(download_format, tags, simple_filename, folder_structure):
     if '14' in download_format:
-        extension = '.m4a'
+        extension = 'm4a'
     else:
-        extension = '.opus'
+        extension = 'opus'
     if platform.system() == 'Windows':
         current_directory = '\\\\?\\' + os.getcwd()
         slash = '\\'
     else:
         current_directory = os.getcwd()
         slash = '/'
-    track_download_directory = current_directory + slash + 'YouTube Music' + slash + tags['album_artist_fixed'] + slash \
-                              + tags['album_fixed'] + slash + tags['track_number_fixed'] + ' ' \
-                              + tags['track_title_fixed'] + extension
+    if simple_filename:
+        filename = f"{tags['artist_fixed']} - {tags['track_title_fixed']}.{extension}"
+    else:
+        filename = f"{tags['track_number_fixed']} {tags['track_title_fixed']}.{extension}"
+    if folder_structure:
+        track_download_directory = current_directory + slash + 'YouTube Music' + slash + tags['album_artist_fixed'] + slash \
+                                   + tags['album_fixed'] + slash + filename
+    else:
+        track_download_directory = filename
     return track_download_directory
 
 
@@ -154,19 +152,13 @@ def get_ydl_opts(track_download_directory, download_format, use_cookie):
         'no_warnings': True,
         'format': download_format,
     }
-    if download_format == '251':
-        ydl_opts['postprocessors'] = [
-            {
-                'key': 'FFmpegExtractAudio',
-            }
-        ]
     if use_cookie or download_format == '141':
         ydl_opts['cookiefile'] = 'cookies.txt'
     ydl_opts['outtmpl'] = track_download_directory
     return ydl_opts
 
 
-def download_track(ydl_opts, video_id):
+def ydl_download(ydl_opts, video_id):
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download('music.youtube.com/watch?v=' + video_id)
 
@@ -225,17 +217,26 @@ def apply_tags(track_download_directory, download_format, exclude_tags, tags):
             file.save()
 
 
-def save_artwork(tags):
+def fix_opus(track_download_directory):
+    os.system(f'ffmpeg -i "{track_download_directory}" -c copy -f opus "{track_download_directory}.temp"')
+    os.remove(track_download_directory)
+    os.rename(track_download_directory + '.temp', track_download_directory)
+
+
+def save_artwork(tags, folder_structure):
     if platform.system() == 'Windows':
         current_directory = '\\\\?\\' + os.getcwd()
         slash = '\\'
     else:
         current_directory = os.getcwd()
         slash = '/'
-    cover_download_directory = current_directory + slash + 'YouTube Music' + slash + tags['album_artist_fixed'] + slash \
-                              + tags['album_fixed'] + slash + 'Cover.jpg'
+    if folder_structure:
+        artwork_directory = current_directory + slash + 'YouTube Music' + slash + tags['album_artist_fixed'] + slash \
+                            + tags['album_fixed'] + slash + 'Cover.jpg'
+    else:
+        artwork_directory = 'Cover.jpg'
     with open(
-            cover_download_directory, 'wb'
+            artwork_directory, 'wb'
     ) as cover_file:
         cover_file.write(tags['artwork'])
 
@@ -244,42 +245,54 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='A Python script to download YouTube Music tracks ')
     parser.add_argument(
         'url',
-        help='Any valid YouTube Music URL.',
+        help='Download YouTube Music track/album/playlist.',
         nargs='+',
+        metavar='<url>'
     )
     parser.add_argument(
         '--u',
         '--usecookie',
         action='store_true',
-        help='Use cookie file named "cookies.txt" located at the current directory of this script to download tracks.',
+        help='Use cookie file named "cookies.txt" located at the current directory to download songs.',
     )
     parser.add_argument(
         "--f",
-        "--format",
-        choices=['141', '251', '140'],
+        "--downloadformat",
         default='140',
-        help='141 (AAC 256kbps), 251 (Opus 160kbps) or 140 (AAC 128kbps). A YouTube Music Premium cookie file named '
-             '"cookies.txt" located at the current directory of this script is required to download format 141 tracks. '
-             'Default format is 140',
+        help='Set download format. Valid download formats are 128 (128kbps AAC .m4a), 251 (128bps Opus .opus) and 141 (256kbps AAC .m4a).',
+        metavar='<download format>'
     )
     parser.add_argument(
         '--e',
         '--excludetags',
         default=[],
-        help='Any valid tag ("album", "album_artist", "artist", "artwork", "lyrics", "rating", "total_tracks", '
-             '"track_number", "track_title" and "year") separated by comma with no spaces.',
+        help='Set exclude tags. Valid tags are "all", "album", "album_artist", "artist", "artwork", "lyrics", "rating", "total_tracks", "track_number", "track_title" and "year"',
+        metavar='<tag 1>,<tag 2>,<tag 3> ...'
     )
     parser.add_argument(
         '--s',
         '--saveartwork',
         action='store_true',
-        help='Save artwork as "Cover.jpg" in download directory.',
+        help='Save artwork as "Cover.jpg" in track download directory.',
     )
     parser.add_argument(
         '--a',
         '--artworksize',
         default='1200',
-        help='"max" or any value from 1 to 16383. Default is "1200".'
+        metavar='<size>',
+        help='Set artwork size. Valid sizes are max (16383) or a number between 1 to 16383.'
+    )
+    parser.add_argument(
+        '--n',
+        '--nofolderstructure',
+        action='store_false',
+        help='Set tracks to download in current directory instead of YouTube/<Album Artist>/<Album>/<File>.',
+    )
+    parser.add_argument(
+        '--p',
+        '--simplefilename',
+        action='store_true',
+        help='Set tracks to download with the file name template "<Artist> - <Track Title>" instead of "<Track Number> <Track Title>".',
     )
     args = parser.parse_args()
     url = args.url
@@ -288,22 +301,27 @@ if __name__ == '__main__':
     exclude_tags = args.e
     artwork_save = args.s
     artwork_size = args.a
+    simple_filename = args.p
+    folder_structure = args.n
+
+    valid_download_formats = ['140', '251', '141']
+    if download_format not in valid_download_formats:
+        parser.error(f'"{download_format}" is not a valid download format.')
 
     if exclude_tags:
         exclude_tags = exclude_tags.split(',')
-        valid_tags = ['album', 'album_artist', 'artist', 'artwork', 'lyrics', 'rating', 'total_tracks', 'track_number',
-                      'track_title', 'year']
-        for i in range(len(exclude_tags)):
-            if exclude_tags[i] not in valid_tags:
-                parser.error(f'"{exclude_tags[i]}" is not a valid tag.')
+        if 'all' not in exclude_tags:
+            valid_exclude_tags = ['album', 'album_artist', 'artist', 'artwork', 'lyrics', 'rating', 'total_tracks', 'track_number',
+                        'track_title', 'year']
+            for i in range(len(exclude_tags)):
+                if exclude_tags[i] not in valid_exclude_tags:
+                    parser.error(f'"{exclude_tags[i]}" is not a valid tag.')
 
     if artwork_size == 'max':
         artwork_size = '16383'
     else:
-        try:
-            if (int(artwork_size) < 0) or (int(artwork_size) > 16383):
-                parser.error(f'"{artwork_size}" is not a valid artwork size.')
-        except:
+        valid_artwork_sizes = [str(x + 1) for x in range(16383)]
+        if artwork_size not in valid_artwork_sizes:
             parser.error(f'"{artwork_size}" is not a valid artwork size.')
 
     if use_cookie or download_format == '141':
@@ -327,12 +345,14 @@ if __name__ == '__main__':
             print(f'Getting tags ({str(i + 1)} of {str(len(video_id))})...')
             tags = get_tags(video_id[i], artwork_size)
             print(f'Downloading "{tags["track_title"]}" ({str(i + 1)} of {str(len(video_id))})...')
-            track_download_directory = get_track_download_directory(download_format, tags)
+            track_download_directory = get_track_download_directory(download_format, tags, simple_filename, folder_structure)
             ydl_opts = get_ydl_opts(track_download_directory, download_format, use_cookie)
-            download_track(ydl_opts, video_id[i])
+            ydl_download(ydl_opts, video_id[i])
+            if download_format == '251':
+                fix_opus(track_download_directory)
             apply_tags(track_download_directory, download_format, exclude_tags, tags)
             if artwork_save:
-                save_artwork(tags)
+                save_artwork(tags, folder_structure)
             print(f'Download finished ({str(i + 1)} of {str(len(video_id))})!')
         except KeyboardInterrupt:
             exit()
