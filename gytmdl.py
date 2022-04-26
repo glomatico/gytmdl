@@ -33,6 +33,8 @@ def get_video_id(url):
                 video_id.append(ydl_extracted_info['entries'][i]['id'])
             return video_id
         if 'watch' in ydl_extracted_info['webpage_url_basename']:
+            if len(ydl_extracted_info["id"]) > 11:
+                return [ydl_extracted_info['entries'][0]['id']]
             return [ydl_extracted_info['id']]
 
 
