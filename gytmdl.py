@@ -6,7 +6,7 @@ import os
 from mutagen.mp4 import MP4, MP4Cover
 import music_tag
 import argparse
-import traceback
+#import traceback
 
 ytmusic = YTMusic()
 
@@ -366,7 +366,7 @@ def main():
         except:
             print(f'* Download failed ({str(i + 1)} of {str(len(video_id))}).')
             error_count += 1
-            traceback.print_exc()
+            #traceback.print_exc()
     print(f'All done ({error_count} error(s)).')
 
 
