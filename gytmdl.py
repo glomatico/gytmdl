@@ -252,9 +252,13 @@ def delete_track_file(track_download_directory, only_temp = True):
     if only_temp:
         if os.path.exists(track_download_directory + '.temp'):
             os.remove(track_download_directory + '.temp')
+        if os.path.exists(track_download_directory + '.part'):
+            os.remove(track_download_directory + '.part')
     else:
         if os.path.exists(track_download_directory + '.temp'):
             os.remove(track_download_directory + '.temp')
+        if os.path.exists(track_download_directory + '.part'):
+            os.remove(track_download_directory + '.part')
         if os.path.exists(track_download_directory):
             os.remove(track_download_directory)
 
