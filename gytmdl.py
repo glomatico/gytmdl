@@ -165,6 +165,7 @@ def get_ydl_opts(track_download_directory, download_format, use_cookie):
     ydl_opts = {
         'quiet': True,
         'no_warnings': True,
+        'overwrites': True,
         'format': download_format,
         'outtmpl': track_download_directory
     }
@@ -245,6 +246,17 @@ def download_artwork(download_directory, artwork):
     artwork_download_directory = f'{download_directory}{slash}Cover.jpg'
     with open(artwork_download_directory, 'wb') as artwork_file:
         artwork_file.write(artwork)
+
+
+def delete_track_file(track_download_directory, only_temp = True):
+    if only_temp:
+        if os.path.exists(track_download_directory + '.temp'):
+            os.remove(track_download_directory + '.temp')
+    else:
+        if os.path.exists(track_download_directory + '.temp'):
+            os.remove(track_download_directory + '.temp')
+        if os.path.exists(track_download_directory):
+            os.remove(track_download_directory)
 
 
 def main():
@@ -361,6 +373,7 @@ def main():
             if artwork_download:
                 download_artwork(download_directory, artwork)
             print(f'Download finished ({str(i + 1)} of {str(len(video_id))})!')
+            delete_track_file(track_download_directory)
         except KeyboardInterrupt:
             exit()
         except:
