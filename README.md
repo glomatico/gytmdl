@@ -1,5 +1,5 @@
 # Glomatico's YouTube Music Downloader
-A Python script to download YouTube Music songs with audio quality up to 256kpbs AAC m4a and with tags from YouTube Music.
+A Python script to download YouTube Music tracks with YouTube Music tags and audio quality up to 256kpbs AAC m4a.
 
 ## Basic usage
 ```
