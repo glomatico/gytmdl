@@ -10,4 +10,4 @@ You can also use the `-d` argument to specify a download format. Valid download 
 Make sure to add ffmpeg to path and install "requirements.txt" with pip.
 
 ## Cookies
-If you want to download age restricted tracks or download tracks on 141 format (AAC 256kbps, use this Chrome extension in YouTube Music's website to grab your cookie file: https://chrome.google.com/webstore/detail/get-cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid. You should save it as "cookies.txt" at the current directory of the script. A YouTube Premium subscription is required to download tracks on 141 format.
+If you want to download age restricted tracks or download tracks on 141 format (AAC 256kbps), use this Chrome extension in YouTube Music's website to grab your cookie file: https://chrome.google.com/webstore/detail/get-cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid. You should save it as "cookies.txt" at the current directory of the script. A YouTube Premium subscription is required to download tracks on 141 format.
