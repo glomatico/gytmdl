@@ -168,7 +168,6 @@ def apply_tags(download_format, download_location, tags):
         if tags['lyrics'] is not None:
             file['\xa9lyr'] = tags['lyrics']
         file['\xa9nam'] = tags['title']
-        file['trkn'] = [(0, tags['total_tracks'])]
         file['trkn'] = [(tags['track_number'], tags['total_tracks'])]
         file['rtng'] = [tags['rating']]
         file['\xa9day'] = tags['year']
