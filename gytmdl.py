@@ -127,7 +127,7 @@ def get_download_location(tags, download_format):
     else:
         download_location = os.getcwd()
         slash = '/'
-    download_location += f'{slash}YouTube Music{slash}{get_sanizated_string(tags["album_artist"], True)}{slash}{get_sanizated_string(tags["album"])}{slash}{tags["track_number"]:02d} {get_sanizated_string(tags["title"])}.{file_extension}'
+    download_location += f'{slash}YouTube Music{slash}{get_sanizated_string(tags["album_artist"], True)}{slash}{get_sanizated_string(tags["album"], True)}{slash}{tags["track_number"]:02d} {get_sanizated_string(tags["title"])}.{file_extension}'
     return download_location
 
 
