@@ -173,51 +173,53 @@ def apply_tags(download_format, download_location, tags):
         file['\xa9day'] = tags['year']
         file.save(download_location)
 
-parser = argparse.ArgumentParser(description = 'A Python script to download YouTube Music tracks with YouTube Music tags.')
-parser.add_argument(
-    'url',
-    help='Download YouTube Music track/album/playlist.',
-    nargs='+',
-    metavar='<url 1> <url 2> <url 3> ...'
-)
-parser.add_argument(
-    "-d",
-    "--downloadformat",
-    default = '140',
-    help = 'Set download format. Valid download formats are 141 (256kbps AAC m4a), 251 (128bps Opus opus) and 140 (128kbps AAC m4a).',
-    metavar = '<download format>'
-)
-args = parser.parse_args()
-download_format = args.downloadformat
-url = args.url
 
-video_id = []
-title = []
-for i in range(len(url)):
-    try:
-        print(f'Checking URL ({i + 1} of {len(url)})...')
-        download_info = get_download_info(url[i])
-        video_id += (list(download_info.keys()))
-        title += (list(download_info.values()))
-    except:
-        continue
-if not video_id:
-    exit('No valid URL entered.')
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description = 'A Python script to download YouTube Music tracks with YouTube Music tags.')
+    parser.add_argument(
+        'url',
+        help='Download YouTube Music track/album/playlist.',
+        nargs='+',
+        metavar='<url 1> <url 2> <url 3> ...'
+    )
+    parser.add_argument(
+        "-d",
+        "--downloadformat",
+        default = '140',
+        help = 'Set download format. Valid download formats are 141 (256kbps AAC m4a), 251 (128bps Opus opus) and 140 (128kbps AAC m4a).',
+        metavar = '<download format>'
+    )
+    args = parser.parse_args()
+    download_format = args.downloadformat
+    url = args.url
 
-error_count = 0
-for i in range(len(video_id)):
-    try:
-        print(f'Downloading "{title[i]}" ({str(i + 1)} of {str(len(video_id))})...')
-        tags = get_tags(video_id[i])
-        download_location = get_download_location(tags, download_format)
-        temp_download_location = download_location + '.temp'
-        download(download_format, temp_download_location, video_id[i])
-        fixup(temp_download_location, download_location)
-        apply_tags(download_format, download_location, tags)
-    except KeyboardInterrupt:
-        exit()
-    except:
-        print(f'* Failed to dowload "{title[i]}" ({str(i + 1)} of {str(len(video_id))}).')
-        error_count += 1
+    video_id = []
+    title = []
+    for i in range(len(url)):
+        try:
+            print(f'Checking URL ({i + 1} of {len(url)})...')
+            download_info = get_download_info(url[i])
+            video_id += (list(download_info.keys()))
+            title += (list(download_info.values()))
+        except:
+            continue
+    if not video_id:
+        exit('No valid URL entered.')
 
-print(f'All done ({error_count} error(s)).')
+    error_count = 0
+    for i in range(len(video_id)):
+        try:
+            print(f'Downloading "{title[i]}" ({str(i + 1)} of {str(len(video_id))})...')
+            tags = get_tags(video_id[i])
+            download_location = get_download_location(tags, download_format)
+            temp_download_location = download_location + '.temp'
+            download(download_format, temp_download_location, video_id[i])
+            fixup(temp_download_location, download_location)
+            apply_tags(download_format, download_location, tags)
+        except KeyboardInterrupt:
+            exit()
+        except:
+            print(f'* Failed to dowload "{title[i]}" ({str(i + 1)} of {str(len(video_id))}).')
+            error_count += 1
+
+    print(f'All done ({error_count} error(s)).')
