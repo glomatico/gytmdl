@@ -131,16 +131,16 @@ def get_download_location(tags, download_format):
     return download_location
 
 
-def download(download_format, temp_download_location, video_id):
+def download(download_format, download_location, video_id):
     ydl_opts_download['format'] = download_format
-    ydl_opts_download['outtmpl'] = temp_download_location
+    ydl_opts_download['outtmpl'] = download_location + '.temp'
     with YoutubeDL(ydl_opts_download) as ydl:
         ydl.download(f'music.youtube.com/watch?v={video_id}')
 
 
-def fixup(temp_download_location, download_location):
-    os.system(f'ffmpeg -loglevel 0 -i "{temp_download_location}" -c copy "{download_location}"')
-    os.remove(temp_download_location)
+def fixup(download_location):
+    os.system(f'ffmpeg -loglevel 0 -i "{download_location}.temp" -c copy "{download_location}"')
+    os.remove(download_location + '.temp')
 
 
 def apply_tags(download_format, download_location, tags):
@@ -212,9 +212,8 @@ if __name__ == '__main__':
             print(f'Downloading "{title[i]}" ({str(i + 1)} of {str(len(video_id))})...')
             tags = get_tags(video_id[i])
             download_location = get_download_location(tags, download_format)
-            temp_download_location = download_location + '.temp'
-            download(download_format, temp_download_location, video_id[i])
-            fixup(temp_download_location, download_location)
+            download(download_format, download_location, video_id[i])
+            fixup(download_location)
             apply_tags(download_format, download_location, tags)
         except KeyboardInterrupt:
             exit()
