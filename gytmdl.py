@@ -139,7 +139,7 @@ def download(download_format, download_location, video_id):
 
 
 def fixup(download_location):
-    os.system(f'ffmpeg -loglevel 0 -i "{download_location}.temp" -c copy "{download_location}"')
+    os.system(f'ffmpeg -loglevel 0 -y -i "{download_location}.temp" -c copy "{download_location}"')
     os.remove(download_location + '.temp')
 
 
