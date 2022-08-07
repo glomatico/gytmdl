@@ -61,6 +61,22 @@ def get_artist_string(artists):
     return artist
 
 
+def get_composer(description):
+    description = description[10:-2]
+    composer_list = []
+    for i in description:
+        personal = i.split(':')
+        if 'Composer' in personal or 'Lyricist' in personal[0]:
+            composer_list.append(personal[1][1:])
+    if not composer_list:
+        return None
+    if len(composer_list) == 1:
+        return composer_list[0]
+    composer = ', '.join(composer_list[:-1])
+    composer += f' & {composer_list[-1]}'
+    return composer
+
+
 def get_tags(video_id):
     ytmusic_watch_playlist = ytmusic.get_watch_playlist(video_id)
     ytmusic_album_details = ytmusic.get_album(ytmusic_watch_playlist['tracks'][0]['album']['id'])
@@ -83,10 +99,17 @@ def get_tags(video_id):
         )
     for i in range(len(ydl_extracted_info['entries'])):
         if ydl_extracted_info['entries'][i]['id'] == video_id:
+            with YoutubeDL(ydl_opts_extract_info) as ydl:
+                description = ydl.extract_info(
+                    f'https://www.youtube.com/watch?v={video_id}',
+                    download = False,
+                )['description'].splitlines()
             if ytmusic_album_details['tracks'][i]['isExplicit']:
                 rating = 4
             else:
                 rating = 0
+            composer = get_composer(description)
+            copyright = description[6]
             track_number = 1 + i
             break
     year = ytmusic_album_details['year']
@@ -95,6 +118,8 @@ def get_tags(video_id):
         'album_artist': album_artist,
         'artist': artist,
         'comment': comment,
+        'composer': composer,
+        'copyright': copyright,
         'cover': cover,
         'lyrics': lyrics,
         'rating': rating,
@@ -150,6 +175,8 @@ def apply_tags(download_format, download_location, tags):
         file['album_artist'] = tags['album_artist']
         file['artist'] = tags['artist']
         file['comment'] = tags['comment']
+        if tags['composer'] is not None:
+            file['composer'] = tags['composer']
         file['artwork'] = tags['cover']
         if tags['lyrics'] is not None:
             file['lyrics'] = tags['lyrics']
@@ -165,6 +192,9 @@ def apply_tags(download_format, download_location, tags):
         file['\xa9ART'] = tags['artist']
         file['\xa9cmt'] = tags['comment']
         file['covr'] = [MP4Cover(tags['cover'], imageformat=MP4Cover.FORMAT_JPEG)]
+        if tags['composer'] is not None:
+            file['\xa9wrt'] = tags['composer']
+        file['cprt'] = tags['copyright']
         if tags['lyrics'] is not None:
             file['\xa9lyr'] = tags['lyrics']
         file['\xa9nam'] = tags['title']
@@ -184,8 +214,8 @@ if __name__ == '__main__':
         metavar='<url 1> <url 2> <url 3> ...'
     )
     parser.add_argument(
-        "-d",
-        "--downloadformat",
+        '-d',
+        '--downloadformat',
         default = '140',
         help = 'Set download format. Valid download formats are 141 (256kbps AAC m4a), 251 (128bps Opus opus) and 140 (128kbps AAC m4a).',
         metavar = '<download format>'
