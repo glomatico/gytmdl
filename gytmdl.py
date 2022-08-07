@@ -6,6 +6,7 @@ import os
 import music_tag
 from mutagen.mp4 import MP4, MP4Cover
 import argparse
+import dateutil.parser
 
 ytmusic = YTMusic()
 
@@ -111,8 +112,8 @@ def get_tags(video_id):
             composer = get_composer(description)
             copyright = description[6]
             track_number = 1 + i
+            year = dateutil.parser.parse(description[8].split(':')[1][1:]).isoformat() + 'Z'
             break
-    year = ytmusic_album_details['year']
     return {
         'album': album,
         'album_artist': album_artist,
@@ -239,17 +240,17 @@ if __name__ == '__main__':
 
     error_count = 0
     for i in range(len(video_id)):
-        try:
-            print(f'Downloading "{title[i]}" ({str(i + 1)} of {str(len(video_id))})...')
-            tags = get_tags(video_id[i])
-            download_location = get_download_location(tags, download_format)
-            download(download_format, download_location, video_id[i])
-            fixup(download_location)
-            apply_tags(download_format, download_location, tags)
-        except KeyboardInterrupt:
-            exit()
-        except:
-            print(f'* Failed to dowload "{title[i]}" ({str(i + 1)} of {str(len(video_id))}).')
-            error_count += 1
+        #try:
+        print(f'Downloading "{title[i]}" ({str(i + 1)} of {str(len(video_id))})...')
+        tags = get_tags(video_id[i])
+        download_location = get_download_location(tags, download_format)
+        download(download_format, download_location, video_id[i])
+        fixup(download_location)
+        apply_tags(download_format, download_location, tags)
+        #except KeyboardInterrupt:
+        #    exit()
+        #except:
+        #    print(f'* Failed to dowload "{title[i]}" ({str(i + 1)} of {str(len(video_id))}).')
+        #    error_count += 1
 
     print(f'All done ({error_count} error(s)).')
