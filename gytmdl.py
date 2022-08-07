@@ -184,7 +184,7 @@ def apply_tags(download_format, download_location, tags):
         file['total_tracks'] = tags['total_tracks']
         file['track_number'] = tags['track_number']
         file['track_title'] = tags['title']
-        file['year'] = tags['year']
+        file['year'] = tags['year'].split('-')[0]
         file.save()
     else:
         file = MP4(download_location).tags
@@ -240,17 +240,17 @@ if __name__ == '__main__':
 
     error_count = 0
     for i in range(len(video_id)):
-        #try:
-        print(f'Downloading "{title[i]}" ({str(i + 1)} of {str(len(video_id))})...')
-        tags = get_tags(video_id[i])
-        download_location = get_download_location(tags, download_format)
-        download(download_format, download_location, video_id[i])
-        fixup(download_location)
-        apply_tags(download_format, download_location, tags)
-        #except KeyboardInterrupt:
-        #    exit()
-        #except:
-        #    print(f'* Failed to dowload "{title[i]}" ({str(i + 1)} of {str(len(video_id))}).')
-        #    error_count += 1
+        try:
+            print(f'Downloading "{title[i]}" ({str(i + 1)} of {str(len(video_id))})...')
+            tags = get_tags(video_id[i])
+            download_location = get_download_location(tags, download_format)
+            download(download_format, download_location, video_id[i])
+            fixup(download_location)
+            apply_tags(download_format, download_location, tags)
+        except KeyboardInterrupt:
+            exit()
+        except:
+            print(f'* Failed to dowload "{title[i]}" ({str(i + 1)} of {str(len(video_id))}).')
+            error_count += 1
 
     print(f'All done ({error_count} error(s)).')
