@@ -6,47 +6,57 @@ import os
 import music_tag
 from mutagen.mp4 import MP4, MP4Cover
 import argparse
-import dateutil.parser
 
 ytmusic = YTMusic()
 
-ydl_opts_extract_info = {
-    'extract_flat': True,
-    'skip_download': True,
-    'quiet': True,
-    'no_warnings': True
-}
 
-ydl_opts_download = {
-    'cookiefile': 'cookies.txt',
-    'quiet': True,
-    'no_warnings': True,
-    'overwrites': True,
-    'fixup': 'never'
-}
-
-
-def get_download_info(url):
-    url = url.split('&')[0]
-    download_info = {}
-    with YoutubeDL(ydl_opts_extract_info) as ydl:
+def get_ydl_extract_info(url):
+    ydl_opts = {
+        'extract_flat': True,
+        'skip_download': True,
+        'quiet': True,
+        'no_warnings': True,
+        'cookiefile': 'cookies.txt'
+    }
+    with YoutubeDL(ydl_opts) as ydl:
         ydl_extract_info = ydl.extract_info(
             url,
             download = False
         )
+    return ydl_extract_info  
+
+
+def get_download_info(url, format_id):
+    url = url.split('&')[0]
+    download_info = []
+    ydl_extract_info = get_ydl_extract_info(url)
     if 'youtube' in ydl_extract_info['extractor']:
         if 'MPREb' in ydl_extract_info['webpage_url_basename']:
-            with YoutubeDL(ydl_opts_extract_info) as ydl:
-                ydl_extract_info = ydl.extract_info(
-                    ydl_extract_info['url'],
-                    download = False
-                )
+            ydl_extract_info = get_ydl_extract_info(url)
         if 'playlist' in ydl_extract_info['webpage_url_basename']:
-            for i in range(len(ydl_extract_info['entries'])):
-                download_info[ydl_extract_info['entries'][i]['id']] = ydl_extract_info['entries'][i]['title']
+            entries = ydl_extract_info['entries']
+            for entry in entries:
+                ydl_extract_info = get_ydl_extract_info(f'https://music.youtube.com/watch?v={entry["id"]}')
+                for download_format in ydl_extract_info['formats']:
+                    if download_format['format_id'] == format_id:
+                        stream_url = download_format['url']
+                download_info.append({
+                    'video_id': ydl_extract_info['id'],
+                    'title': ydl_extract_info['title'],
+                    'stream_url': stream_url,
+                    'description': ydl_extract_info['description'].splitlines()
+                })
             return download_info
         if 'watch' in ydl_extract_info['webpage_url_basename']:
-            download_info[ydl_extract_info['id']] = ydl_extract_info['title']
+            for download_format in ydl_extract_info['formats']:
+                if download_format['format_id'] == format_id:
+                    stream_url = download_format['url']
+            download_info.append({
+                'video_id': ydl_extract_info['id'],
+                'title': ydl_extract_info['title'],
+                'stream_url': stream_url,
+                'description': ydl_extract_info['description'].splitlines()
+            })
             return download_info
     raise Exception()
 
@@ -78,13 +88,14 @@ def get_composer(description):
     return composer
 
 
-def get_tags(video_id):
+def get_tags(video_id, description):
     ytmusic_watch_playlist = ytmusic.get_watch_playlist(video_id)
     ytmusic_album_details = ytmusic.get_album(ytmusic_watch_playlist['tracks'][0]['album']['id'])
     album = ytmusic_album_details['title']
     album_artist = get_artist_string(ytmusic_album_details['artists'])
     artist = get_artist_string(ytmusic_watch_playlist['tracks'][0]['artists'])
     comment = f'https://music.youtube.com/watch?v={video_id}'
+    composer = get_composer(description)
     cover = requests.get(f'{ytmusic_watch_playlist["tracks"][0]["thumbnail"][0]["url"].split("=")[0]}=w1200').content
     try:
         lyrics_id = ytmusic.get_lyrics(ytmusic_watch_playlist['lyrics'])
@@ -93,26 +104,16 @@ def get_tags(video_id):
         lyrics = None
     title = ytmusic_watch_playlist['tracks'][0]['title']
     total_tracks = ytmusic_album_details['trackCount']
-    with YoutubeDL(ydl_opts_extract_info) as ydl:
-        ydl_extracted_info = ydl.extract_info(
-            f'https://www.youtube.com/playlist?list={ytmusic_album_details["audioPlaylistId"]}',
-            download = False,
-        )
+    ydl_extracted_info = get_ydl_extract_info(f'https://www.youtube.com/playlist?list={ytmusic_album_details["audioPlaylistId"]}')
     for i in range(len(ydl_extracted_info['entries'])):
         if ydl_extracted_info['entries'][i]['id'] == video_id:
-            with YoutubeDL(ydl_opts_extract_info) as ydl:
-                description = ydl.extract_info(
-                    f'https://www.youtube.com/watch?v={video_id}',
-                    download = False,
-                )['description'].splitlines()
             if ytmusic_album_details['tracks'][i]['isExplicit']:
                 rating = 4
             else:
                 rating = 0
-            composer = get_composer(description)
             copyright = description[6]
             track_number = 1 + i
-            year = dateutil.parser.parse(description[8].split(':')[1][1:]).isoformat() + 'Z'
+            year = description[8].split(':')[1][1:] + 'T00:00:00Z'
             break
     return {
         'album': album,
@@ -154,15 +155,21 @@ def get_download_location(tags, download_format):
         download_location = os.getcwd()
         slash = '/'
     download_location += f'{slash}YouTube Music{slash}{get_sanizated_string(tags["album_artist"], True)}{slash}{get_sanizated_string(tags["album"], True)}{slash}{tags["track_number"]:02d} {get_sanizated_string(tags["title"])}.{file_extension}'
-    return download_location
+    return download_location                    
+        
 
-
-def download(download_format, download_location, video_id):
-    ydl_opts_download['format'] = download_format
-    ydl_opts_download['outtmpl'] = download_location + '.temp'
-    with YoutubeDL(ydl_opts_download) as ydl:
-        ydl.download(f'music.youtube.com/watch?v={video_id}')
-
+def download(stream_url, download_location):
+    ydl_opts = {
+        'quiet': True,
+        'no_warnings': True,
+        'cookiefile': 'cookies.txt',
+        'overwrites': True,
+        'fixup': 'never',
+        'outtmpl': download_location + '.temp'
+    }
+    with YoutubeDL(ydl_opts) as ydl:
+        ydl.download(stream_url)
+    
 
 def fixup(download_location):
     os.system(f'ffmpeg -loglevel 0 -y -i "{download_location}.temp" -c copy -map_metadata -1 -fflags bitexact "{download_location}"')
@@ -225,32 +232,31 @@ if __name__ == '__main__':
     download_format = args.downloadformat
     url = args.url
 
-    video_id = []
-    title = []
+    download_info = []
     for i in range(len(url)):
         try:
             print(f'Checking URL ({i + 1} of {len(url)})...')
-            download_info = get_download_info(url[i])
-            video_id += (list(download_info.keys()))
-            title += (list(download_info.values()))
+            download_info += get_download_info(url[i], download_format)
+        except KeyboardInterrupt:
+            exit()
         except:
-            continue
-    if not video_id:
+            pass
+    if not download_info:
         exit('No valid URL entered.')
 
     error_count = 0
-    for i in range(len(video_id)):
+    for i in range(len(download_info)):
         try:
-            print(f'Downloading "{title[i]}" ({str(i + 1)} of {str(len(video_id))})...')
-            tags = get_tags(video_id[i])
+            print(f'Downloading "{download_info[i]["title"]}" ({i + 1} of {len(download_info)})...')
+            tags = get_tags(download_info[i]['video_id'], download_info[i]['description'])
             download_location = get_download_location(tags, download_format)
-            download(download_format, download_location, video_id[i])
+            download(download_info[i]['stream_url'], download_location)
             fixup(download_location)
             apply_tags(download_format, download_location, tags)
         except KeyboardInterrupt:
             exit()
         except:
-            print(f'* Failed to dowload "{title[i]}" ({str(i + 1)} of {str(len(video_id))}).')
+            print(f'* Failed to dowload "{download_info[i]["title"]}" ({i + 1} of {len(download_info)}).')
             error_count += 1
 
-    print(f'All done ({error_count} error(s)).')
+    print(f'All done ({error_count} error(s)).')    
