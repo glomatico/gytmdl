@@ -95,6 +95,7 @@ def get_tags(video_id, description):
     artist = get_artist_string(ytmusic_watch_playlist['tracks'][0]['artists'])
     comment = f'https://music.youtube.com/watch?v={video_id}'
     composer = get_composer(description)
+    copyright = description[6]
     cover = requests.get(f'{ytmusic_watch_playlist["tracks"][0]["thumbnail"][0]["url"].split("=")[0]}=w1200').content
     try:
         lyrics_id = ytmusic.get_lyrics(ytmusic_watch_playlist['lyrics'])
@@ -110,7 +111,6 @@ def get_tags(video_id, description):
                 rating = 4
             else:
                 rating = 0
-            copyright = description[6]
             track_number = 1 + i
             year = description[8].split(':')[1][1:] + 'T00:00:00Z'
             break
