@@ -11,14 +11,13 @@ ytmusic = YTMusic()
 
 
 def get_ydl_extract_info(url):
-    ydl_opts = {
+    with YoutubeDL({
         'extract_flat': True,
         'skip_download': True,
         'quiet': True,
         'no_warnings': True,
         'cookiefile': 'cookies.txt'
-    }
-    with YoutubeDL(ydl_opts) as ydl:
+    }) as ydl:
         ydl_extract_info = ydl.extract_info(
             url,
             download = False
