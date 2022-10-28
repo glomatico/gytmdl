@@ -1,4 +1,5 @@
-yt-dlp
+pytube
 ytmusicapi
+yt-dlp
 music-tag
 Pillow
