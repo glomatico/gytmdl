@@ -199,7 +199,7 @@ if __name__ == '__main__':
         '-i',
         '--itag',
         default = '140',
-        help = 'Set itag. Valid itags are 141 (256kbps AAC m4a), 251 (128bps Opus opus) and 140 (128kbps AAC m4a).',
+        help = 'Set itag (quality). Valid itags are 141 (256kbps AAC m4a), 251 (128bps Opus opus) and 140 (128kbps AAC m4a).',
         metavar = '<itag>'
     )
     args = parser.parse_args()
