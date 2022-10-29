@@ -15,7 +15,7 @@ def get_ydl_extract_info(url):
         'no_warnings': True,
         'extract_flat': True
     }) as ydl:
-        return ydl.extract_info(url)
+        return ydl.extract_info(url, download = False)
 
 
 def get_download_info(url):
@@ -24,8 +24,8 @@ def get_download_info(url):
     if not 'youtube' in ydl_extract_info['webpage_url']:
         raise Exception()
     if 'MPREb_' in ydl_extract_info['webpage_url_basename']:
-        url = ydl_extract_info['url']
-    if 'playlist' in url:
+        ydl_extract_info = get_ydl_extract_info(ydl_extract_info['url'])
+    if 'playlist' in ydl_extract_info['webpage_url_basename']:
         track_number = 1
         for video in ydl_extract_info['entries']:
             download_info.append({
@@ -34,7 +34,7 @@ def get_download_info(url):
                 'video_id': video['id']
             })
             track_number += 1
-    if 'watch' in url:
+    if 'watch' in ydl_extract_info['webpage_url_basename']:
         download_info.append({
             'title': ydl_extract_info['title'],
             'track_number': None,
@@ -74,7 +74,7 @@ def get_tags(video_id, track_number):
     year = ytmusic_album['year']
     if not track_number:
         track_number = 1
-        for video in get_ydl_extract_info(f'youtube.com/playlist?list={ytmusic_album["audioPlaylistId"]}'):
+        for video in get_ydl_extract_info(f'https://www.youtube.com/playlist?list={ytmusic_album["audioPlaylistId"]}')['entries']:
             if video['id'] == video_id:
                 if ytmusic_album['tracks'][track_number - 1]['isExplicit']:
                     rating = 4
