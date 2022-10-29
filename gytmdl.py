@@ -1,55 +1,46 @@
-from ytmusicapi import YTMusic
-from pytube import Playlist, YouTube
+from yt_dlp import YoutubeDL
 import requests
 from pathlib import Path
 import os
-from yt_dlp import YoutubeDL
 import music_tag
 from mutagen.mp4 import MP4, MP4Cover
-import argparse
 import shutil
+import argparse
+from ytmusicapi import YTMusic
 
-ytmusic = YTMusic()
+
+def get_ydl_extract_info(url):
+    with YoutubeDL({
+        'quiet': True,
+        'no_warnings': True,
+        'extract_flat': True
+    }) as ydl:
+        return ydl.extract_info(url)
 
 
 def get_download_info(url):
     download_info = []
-    if 'youtu.be' in url:
-        url = url.replace('youtu.be', 'youtube.com/watch?v=')
-    if 'MPREb_' in url:
-        url = f'youtube.com/playlist?list={ytmusic.get_album(url.split("/")[-1])["audioPlaylistId"]}'
+    ydl_extract_info = get_ydl_extract_info(url)
+    if not 'youtube' in ydl_extract_info['webpage_url']:
+        raise Exception()
+    if 'MPREb_' in ydl_extract_info['webpage_url_basename']:
+        url = ydl_extract_info['url']
     if 'playlist' in url:
-        playlist = Playlist(url)
-        for video in playlist.videos:
+        track_number = 1
+        for video in ydl_extract_info['entries']:
             download_info.append({
-                'description': video.description.splitlines(),
-                'title': video.title,
-                'video_id': video.video_id
+                'title': video['title'],
+                'track_number': track_number,
+                'video_id': video['id']
             })
+            track_number += 1
     if 'watch' in url:
-        video = YouTube(url)
         download_info.append({
-            'description': video.description.splitlines(),
-            'title': video.title,
-            'video_id': video.video_id
+            'title': ydl_extract_info['title'],
+            'track_number': None,
+            'video_id': ydl_extract_info['id']
         })
     return download_info
-
-
-def get_composer(description):
-    description = description[10:-2]
-    composer_list = []
-    for i in description:
-        personal = i.split(':')
-        if 'Composer' in personal or 'Lyricist' in personal[0]:
-            composer_list.append(personal[1][1:])
-    if not composer_list:
-        return None
-    if len(composer_list) == 1:
-        return composer_list[0]
-    composer = ', '.join(composer_list[:-1])
-    composer += f' & {composer_list[-1]}'
-    return composer
 
 
 def get_artist(ytmusic_artist):
@@ -63,15 +54,15 @@ def get_artist(ytmusic_artist):
     return artist
 
 
-def get_tags(video_id, description):
+def get_tags(video_id, track_number):
     ytmusic_watch_playlist = ytmusic.get_watch_playlist(video_id)
+    if not ytmusic_watch_playlist['tracks'][0]['length'] or not ytmusic_watch_playlist['tracks'][0].get('album'):
+        raise Exception()
     ytmusic_album = ytmusic.get_album(ytmusic_watch_playlist['tracks'][0]['album']['id'])
     album = ytmusic_album['title']
     album_artist = get_artist(ytmusic_album['artists'])
     artist = get_artist(ytmusic_watch_playlist['tracks'][0]['artists'])
     comment = f'https://music.youtube.com/watch?v={video_id}'
-    composer = get_composer(description)
-    copyright = description[6]
     cover = requests.get(f'{ytmusic_watch_playlist["tracks"][0]["thumbnail"][0]["url"].split("=")[0]}=w1200').content
     try:
         lyrics_id = ytmusic.get_lyrics(ytmusic_watch_playlist['lyrics'])
@@ -80,23 +71,27 @@ def get_tags(video_id, description):
         lyrics = None
     title = ytmusic_watch_playlist['tracks'][0]['title']
     total_tracks = ytmusic_album['trackCount']
-    track_number = 1
     year = ytmusic_album['year']
-    for video in Playlist(f'youtube.com/playlist?list={ytmusic_album["audioPlaylistId"]}'):
-        if video.split('=')[-1] == video_id:
-            if ytmusic_album['tracks'][track_number - 1]['isExplicit']:
-                rating = 4
-            else:
-                rating = 0
-            break
-        track_number += 1
+    if not track_number:
+        track_number = 1
+        for video in get_ydl_extract_info(f'youtube.com/playlist?list={ytmusic_album["audioPlaylistId"]}'):
+            if video['id'] == video_id:
+                if ytmusic_album['tracks'][track_number - 1]['isExplicit']:
+                    rating = 4
+                else:
+                    rating = 0
+                break
+            track_number += 1
+    else:
+        if ytmusic_album['tracks'][track_number - 1]['isExplicit']:
+            rating = 4
+        else:
+            rating = 0
     return {
         'album': album,
         'album_artist': album_artist,
         'artist': artist,
         'comment': comment,
-        'composer': composer,
-        'copyright': copyright,
         'cover': cover,
         'lyrics': lyrics,
         'rating': rating,
@@ -134,17 +129,17 @@ def download(video_id, download_location, itag):
         'overwrites': True,
         'fixup': 'never',
         'format': itag,
-        'outtmpl': str(download_location.with_suffix('')),
+        'outtmpl': str(download_location.with_suffix('.temp')),
     }
     if os.path.isfile('cookies.txt'):
         ydl_opts['cookiefile'] = 'cookies.txt'
     with YoutubeDL(ydl_opts) as ydl:
-        ydl.download('https://music.youtube.com/watch?v=' + video_id)
+        ydl.download('music.youtube.com/watch?v=' + video_id)
     
 
 def fixup(download_location):
-    os.system(f'ffmpeg -loglevel 0 -y -i "{download_location.with_suffix("")}" -c copy -map_metadata -1 -fflags bitexact "{download_location}"')
-    os.remove(download_location.with_suffix(''))
+    os.system(f'ffmpeg -loglevel 0 -y -i "{download_location.with_suffix(".temp")}" -c copy -map_metadata -1 -fflags bitexact "{download_location}"')
+    os.remove(download_location.with_suffix('.temp'))
 
 
 def apply_tags(download_location, tags):
@@ -154,8 +149,6 @@ def apply_tags(download_location, tags):
         file['album_artist'] = tags['album_artist']
         file['artist'] = tags['artist']
         file['comment'] = tags['comment']
-        if tags['composer'] is not None:
-            file['composer'] = tags['composer']
         file['artwork'] = tags['cover']
         if tags['lyrics'] is not None:
             file['lyrics'] = tags['lyrics']
@@ -171,9 +164,6 @@ def apply_tags(download_location, tags):
         file['\xa9ART'] = tags['artist']
         file['\xa9cmt'] = tags['comment']
         file['covr'] = [MP4Cover(tags['cover'], imageformat=MP4Cover.FORMAT_JPEG)]
-        if tags['composer'] is not None:
-            file['\xa9wrt'] = tags['composer']
-        file['cprt'] = tags['copyright']
         if tags['lyrics'] is not None:
             file['\xa9lyr'] = tags['lyrics']
         file['\xa9nam'] = tags['title']
@@ -188,6 +178,7 @@ if __name__ == '__main__':
     if not shutil.which('ffmpeg'):
         print('FFmpeg is not on PATH.')
         exit(1)
+    ytmusic = YTMusic()
     parser = argparse.ArgumentParser(description = 'A Python script to download YouTube Music tracks with YouTube Music tags.')
     parser.add_argument(
         'url',
@@ -222,7 +213,7 @@ if __name__ == '__main__':
     for i in range(len(download_info)):
         try:
             print(f'Downloading "{download_info[i]["title"]}" ({i + 1} of {len(download_info)})...')
-            tags = get_tags(download_info[i]['video_id'], download_info[i]['description'])
+            tags = get_tags(download_info[i]['video_id'], download_info[i]['track_number'])
             download_location = get_download_location(tags, itag)
             download(download_info[i]['video_id'], download_location, itag)
             fixup(download_location)
