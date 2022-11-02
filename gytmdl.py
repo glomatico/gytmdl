@@ -77,14 +77,14 @@ def get_tags(video_id, track_number):
         for video in get_ydl_extract_info(f'https://www.youtube.com/playlist?list={ytmusic_album["audioPlaylistId"]}')['entries']:
             if video['id'] == video_id:
                 if ytmusic_album['tracks'][track_number - 1]['isExplicit']:
-                    rating = 4
+                    rating = 1
                 else:
                     rating = 0
                 break
             track_number += 1
     else:
         if ytmusic_album['tracks'][track_number - 1]['isExplicit']:
-            rating = 4
+            rating = 1
         else:
             rating = 0
     return {
@@ -120,8 +120,8 @@ def get_download_location(tags, itag):
     else:
         file_extension = '.m4a'
         truncate = 36
-    album_artist = get_sanizated_string(tags["album_artist"], True)[:40]
-    album = get_sanizated_string(tags["album"], True)[:40]
+    album_artist = get_sanizated_string(tags["album_artist"], True)[:40].strip()
+    album = get_sanizated_string(tags["album"], True)[:40].strip()
     filename = get_sanizated_string(f'{tags["track_number"]:02} {tags["title"]}', True)[:truncate] + file_extension
     download_location = Path(f'YouTube Music/{album_artist}/{album}/{filename}')
     return download_location
