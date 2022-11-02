@@ -63,7 +63,7 @@ def get_tags(video_id, track_number):
     album_artist = get_artist(ytmusic_album['artists'])
     artist = get_artist(ytmusic_watch_playlist['tracks'][0]['artists'])
     comment = f'https://music.youtube.com/watch?v={video_id}'
-    cover = requests.get(f'{ytmusic_watch_playlist["tracks"][0]["thumbnail"][0]["url"].split("=")[0]}=w1200').content
+    cover = requests.get(f'{ytmusic_watch_playlist["tracks"][0]["thumbnail"][0]["url"].split("=")[0]}=w600').content
     try:
         lyrics_id = ytmusic.get_lyrics(ytmusic_watch_playlist['lyrics'])
         lyrics = lyrics_id['lyrics']
@@ -104,7 +104,7 @@ def get_tags(video_id, track_number):
 
 
 def get_sanizated_string(dirty_string, is_folder = False):
-    illegal_characters = ['\\', '/', ':', '*', '?', '"', '<', '>', '|']
+    illegal_characters = ['\\', '/', ':', '*', '?', '"', '<', '>', '|', ';']
     for character in illegal_characters:
         dirty_string = dirty_string.replace(character, '_')
     if is_folder and dirty_string[-1:] == '.':
@@ -115,10 +115,15 @@ def get_sanizated_string(dirty_string, is_folder = False):
 
 def get_download_location(tags, itag):
     if itag == '251':
-        file_extension = 'opus'
+        file_extension = '.opus'
+        truncate = 35
     else:
-        file_extension = 'm4a'
-    download_location = Path(f'YouTube Music/{get_sanizated_string(tags["album_artist"], True)}/{get_sanizated_string(tags["album"], True)}/{tags["track_number"]:02d} {get_sanizated_string(tags["title"])}.{file_extension}')
+        file_extension = '.m4a'
+        truncate = 36
+    album_artist = get_sanizated_string(tags["album_artist"], True)[:40]
+    album = get_sanizated_string(tags["album"], True)[:40]
+    filename = get_sanizated_string(f'{tags["track_number"]:02} {tags["title"]}', True)[:truncate] + file_extension
+    download_location = Path(f'YouTube Music/{album_artist}/{album}/{filename}')
     return download_location
 
 
@@ -198,14 +203,13 @@ if __name__ == '__main__':
     url = args.url
 
     download_info = []
-    for i in range(len(url)):
-        try:
-            print(f'Checking URL ({i + 1} of {len(url)})...')
-            download_info += get_download_info(url[i])
-        except KeyboardInterrupt:
-            exit(0)
-        except:
-            pass
+    try:
+        for u in url:
+            for item in get_download_info(u):
+                if item not in download_info:
+                    download_info.append(item)
+    except:
+        pass
     if not download_info:
         print('No valid URL entered.')
         exit(1)
