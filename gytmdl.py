@@ -122,7 +122,7 @@ def get_download_location(tags, itag):
         truncate = 36
     album_artist = get_sanizated_string(tags["album_artist"], True)[:40].strip()
     album = get_sanizated_string(tags["album"], True)[:40].strip()
-    filename = get_sanizated_string(f'{tags["track_number"]:02} {tags["title"]}', True)[:truncate] + file_extension
+    filename = (get_sanizated_string(f'{tags["track_number"]:02} {tags["title"]}', True)[:truncate] + file_extension).strip()
     download_location = Path(f'YouTube Music/{album_artist}/{album}/{filename}')
     return download_location
 
