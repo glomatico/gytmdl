@@ -206,7 +206,7 @@ if __name__ == '__main__':
     try:
         for i in range(len(url)):
             print(f'Checking URL ({i + 1} of {len(url)})...')
-            for item in get_download_info(u):
+            for item in get_download_info(url[i]):
                 if item not in download_info:
                     download_info.append(item)
     except:
