@@ -141,8 +141,8 @@ class Gytmdl:
             'format': itag,
             'outtmpl': str(temp_location)
         }
-        if Path('cookies.txt').exists():
-            ydl_opts['cookiefile'] = 'cookies.txt'
+        if self.cookies_location.exists():
+            ydl_opts['cookiefile'] = str(self.cookies_location)
         with YoutubeDL(ydl_opts) as ydl:
             ydl.download('music.youtube.com/watch?v=' + video_id) 
     
