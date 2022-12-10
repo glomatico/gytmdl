@@ -204,7 +204,7 @@ if __name__ == '__main__':
         '--final-path',
         default = 'YouTube Music',
         help = 'Final path.',
-        metavar = '<temp_path>'
+        metavar = '<final_path>'
     )
     parser.add_argument(
         '-c',
@@ -221,9 +221,9 @@ if __name__ == '__main__':
     )
     parser.add_argument(
         '-p',
-        '--print-exception',
+        '--print-exceptions',
         action = 'store_true',
-        help = 'Print exception.'
+        help = 'Print exceptions.'
     )
     args = parser.parse_args()
     gytmdl = Gytmdl(args.cookies_location, args.final_path, args.temp_path)
@@ -237,7 +237,7 @@ if __name__ == '__main__':
         except:
             error_count += 1
             print(f'* Failed to check URL {i + 1}.')
-            if args.print_exception:
+            if args.print_exceptions:
                 traceback.print_exc()
     if not download_queue:
         print('* Failed to check all URLs.')
@@ -258,7 +258,7 @@ if __name__ == '__main__':
             except:
                 error_count += 1
                 print(f'* Failed to download "{download_queue[i][j]["title"]}" (track {j + 1} from URL {i + 1})...')
-                if args.print_exception:
+                if args.print_exceptions:
                     traceback.print_exc()
             if not args.skip_cleanup:
                 gytmdl.cleanup()
