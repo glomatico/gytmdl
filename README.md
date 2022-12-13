@@ -1,13 +1,21 @@
 # Glomatico's YouTube Music Downloader
 A Python script to download YouTube Music tracks/albums/playlists with YouTube Music tags and audio quality up to 256kpbs AAC m4a following the iTunes standard.
 
-## Basic usage
-```
-/path/to/python gytmdl.py <url>
-```
-Use `--help` argument to see all available options. 
+## Setup
+1. Install Python 3.8 or higher
+2. Install the required packages using pip: 
+    ```
+    pip install -r requirements.txt
+    ```
+3. Add MP4Box to your PATH. You can get MP4Box here: https://gpac.wp.imt.fr/downloads/
+    * You can also use the one that I provided and add it to PATH or put on the same folder as the script:
+        * Windows: https://drive.google.com/open?id=1o202Kese9Q4dKzzgEtZnznuUx_eJp0bH
+        * Linux: TBD
+5. (Optional) Get your cookies.txt
+    * With cookies.txt, you can download age restricted tracks, private playlists and download tracks using 141 premium only itag (AAC 256kbps). You can get your cookies.txt by using the following Google Chrome extension on YouTube Music website: https://chrome.google.com/webstore/detail/get-cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid. Make sure to export it as `cookies.txt` and put it on the same folder as the script or specify the location to it using the `--cookies-location` argument.
 
-Make sure to add MP4Box to PATH and install "requirements.txt" with pip before running this program. MP4Box can be downloaded from https://gpac.wp.imt.fr/downloads/.
-
-## Cookies
-If you want to download age restricted tracks, private playlists or download tracks using 141 premium only itag (AAC 256kbps), use this Chrome extension in YouTube Music's website to grab your cookies and use in the script: https://chrome.google.com/webstore/detail/get-cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid. Default cookies location is "./cookies.txt", but can be changed using `--cookies-location` argument.
+## Usage
+```
+python gytmdl.py [OPTIONS] [URLS]
+```
+Tracks are saved in `./YouTube Music` by default, but the directory can be changed using `--final-path` argument.
