@@ -262,8 +262,5 @@ if __name__ == '__main__':
                     traceback.print_exc()
             if not args.skip_cleanup:
                 gytmdl.cleanup()
-    print(f'Finished ({error_count} error(s)).')  
-
-
-    
+    print(f'Finished ({error_count} error(s)).')
         
