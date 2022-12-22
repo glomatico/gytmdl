@@ -8,9 +8,6 @@ A Python script to download YouTube Music tracks/albums/playlists with YouTube M
     pip install -r requirements.txt
     ```
 3. Add MP4Box to your PATH. You can get MP4Box here: https://gpac.wp.imt.fr/downloads/
-    * You can also use the one that I provided and add it to PATH or put on the same folder as the script:
-        * Windows: https://drive.google.com/open?id=1o202Kese9Q4dKzzgEtZnznuUx_eJp0bH
-        * Linux: TBD
 5. (Optional) Get your cookies.txt
     * With cookies.txt, you can download age restricted tracks, private playlists and download tracks using 141 premium only itag (AAC 256kbps). You can get your cookies.txt by using the following Google Chrome extension on YouTube Music website: https://chrome.google.com/webstore/detail/get-cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid. Make sure to export it as `cookies.txt` and put it on the same folder as the script or specify the location to it using the `--cookies-location` argument.
 
