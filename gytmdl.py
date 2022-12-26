@@ -59,42 +59,31 @@ class Gytmdl:
         if not ytmusic_watch_playlist['tracks'][0]['length'] or not ytmusic_watch_playlist['tracks'][0].get('album'):
             raise Exception('Not a YouTube Music video or track unavailable')
         ytmusic_album = self.ytmusic.get_album(ytmusic_watch_playlist['tracks'][0]['album']['id'])
-        album = ytmusic_album['title']
-        album_artist = self.get_artist(ytmusic_album['artists'])
-        artist = self.get_artist(ytmusic_watch_playlist['tracks'][0]['artists'])
-        comment = f'https://music.youtube.com/watch?v={video_id}'
-        cover = requests.get(f'{ytmusic_watch_playlist["tracks"][0]["thumbnail"][0]["url"].split("=")[0]}=w600').content
+        tags = {}
+        tags['\xa9alb'] = [ytmusic_album['title']]
+        tags['aART'] = [self.get_artist(ytmusic_album['artists'])]
+        tags['\xa9ART'] = [self.get_artist(ytmusic_watch_playlist['tracks'][0]['artists'])]
+        tags['\xa9cmt'] = [f'https://music.youtube.com/watch?v={video_id}']
+        tags['covr'] = [MP4Cover(requests.get(f'{ytmusic_watch_playlist["tracks"][0]["thumbnail"][0]["url"].split("=")[0]}=w600').content, MP4Cover.FORMAT_JPEG)]
         try:
             lyrics_id = self.ytmusic.get_lyrics(ytmusic_watch_playlist['lyrics'])
-            lyrics = lyrics_id['lyrics']
+            tags['\xa9lyr'] = [lyrics_id['lyrics']]
         except:
-            lyrics = None
-        title = ytmusic_watch_playlist['tracks'][0]['title']
+            pass
+        tags['\xa9nam'] = [ytmusic_watch_playlist['tracks'][0]['title']]
+        tags['\xa9day'] = [ytmusic_album['year']]
         total_tracks = ytmusic_album['trackCount']
-        year = ytmusic_album['year']
         track_number = 1
         for video in self.get_ydl_extract_info(f'https://www.youtube.com/playlist?list={ytmusic_album["audioPlaylistId"]}')['entries']:
             if video['id'] == video_id:
                 if ytmusic_album['tracks'][track_number - 1]['isExplicit']:
-                    rating = 1
+                    tags['rtng'] = [1]
                 else:
-                    rating = 0
+                    tags['rtng'] =  [0]
                 break
             track_number += 1
-        tags = {
-            '\xa9alb': [album],
-            'aART': [album_artist],
-            '\xa9ART': [artist],
-            '\xa9cmt': [comment],
-            'covr': [MP4Cover(cover, MP4Cover.FORMAT_JPEG)],
-            'rtng': [rating],
-            'stik': [1],
-            '\xa9nam': [title],
-            'trkn': [(track_number, total_tracks)],
-            '\xa9day': [year]
-        }
-        if lyrics:
-            tags['\xa9lyr'] = [lyrics]
+        tags['trkn'] = [(track_number, total_tracks)]
+        tags['stik'] = [1]
         return tags
     
 
