@@ -33,18 +33,14 @@ class Gytmdl:
         if 'MPREb_' in ydl_extract_info['webpage_url_basename']:
             ydl_extract_info = self.get_ydl_extract_info(ydl_extract_info['url'])
         if 'playlist' in ydl_extract_info['webpage_url_basename']:
-            track_number = 1
             for video in ydl_extract_info['entries']:
                 download_info.append({
                     'title': video['title'],
-                    'track_number': track_number,
                     'video_id': video['id']
                 })
-                track_number += 1
         if 'watch' in ydl_extract_info['webpage_url_basename']:
             download_info.append({
                 'title': ydl_extract_info['title'],
-                'track_number': None,
                 'video_id': ydl_extract_info['id']
             })
         return download_info
@@ -58,7 +54,7 @@ class Gytmdl:
         return artist
     
 
-    def get_tags(self, video_id, track_number):
+    def get_tags(self, video_id):
         ytmusic_watch_playlist = self.ytmusic.get_watch_playlist(video_id)
         if not ytmusic_watch_playlist['tracks'][0]['length'] or not ytmusic_watch_playlist['tracks'][0].get('album'):
             raise Exception('Not a YouTube Music video or track unavailable')
@@ -76,21 +72,15 @@ class Gytmdl:
         title = ytmusic_watch_playlist['tracks'][0]['title']
         total_tracks = ytmusic_album['trackCount']
         year = ytmusic_album['year']
-        if not track_number:
-            track_number = 1
-            for video in self.get_ydl_extract_info(f'https://www.youtube.com/playlist?list={ytmusic_album["audioPlaylistId"]}')['entries']:
-                if video['id'] == video_id:
-                    if ytmusic_album['tracks'][track_number - 1]['isExplicit']:
-                        rating = 1
-                    else:
-                        rating = 0
-                    break
-                track_number += 1
-        else:
-            if ytmusic_album['tracks'][track_number - 1]['isExplicit']:
-                rating = 1
-            else:
-                rating = 0
+        track_number = 1
+        for video in self.get_ydl_extract_info(f'https://www.youtube.com/playlist?list={ytmusic_album["audioPlaylistId"]}')['entries']:
+            if video['id'] == video_id:
+                if ytmusic_album['tracks'][track_number - 1]['isExplicit']:
+                    rating = 1
+                else:
+                    rating = 0
+                break
+            track_number += 1
         tags = {
             '\xa9alb': [album],
             'aART': [album_artist],
@@ -246,7 +236,7 @@ if __name__ == '__main__':
         for j in range(len(download_queue[i])):
             print(f'Downloading "{download_queue[i][j]["title"]}" (track {j + 1} from URL {i + 1})...')
             try:
-                tags = gytmdl.get_tags(download_queue[i][j]['video_id'], download_queue[i][j]['track_number'])
+                tags = gytmdl.get_tags(download_queue[i][j]['video_id'])
                 temp_location = gytmdl.get_temp_location(download_queue[i][j]['video_id'])
                 gytmdl.download(download_queue[i][j]['video_id'], temp_location, args.itag)
                 temp_location_fixed = gytmdl.get_temp_location_fixed(download_queue[i][j]['video_id'])
@@ -257,7 +247,7 @@ if __name__ == '__main__':
                 exit(0)
             except:
                 error_count += 1
-                print(f'* Failed to download "{download_queue[i][j]["title"]}" (track {j + 1} from URL {i + 1})...')
+                print(f'* Failed to download "{download_queue[i][j]["title"]}" (track {j + 1} from URL {i + 1}).')
                 if args.print_exceptions:
                     traceback.print_exc()
             if not args.skip_cleanup:
