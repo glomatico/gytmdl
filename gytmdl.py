@@ -66,8 +66,9 @@ class Gytmdl:
         tags['\xa9cmt'] = [f'https://music.youtube.com/watch?v={video_id}']
         tags['covr'] = [MP4Cover(requests.get(f'{ytmusic_watch_playlist["tracks"][0]["thumbnail"][0]["url"].split("=")[0]}=w600').content, MP4Cover.FORMAT_JPEG)]
         try:
-            lyrics_id = self.ytmusic.get_lyrics(ytmusic_watch_playlist['lyrics'])
-            tags['\xa9lyr'] = [lyrics_id['lyrics']]
+            lyrics = self.ytmusic.get_lyrics(ytmusic_watch_playlist['lyrics'])['lyrics']
+            if lyrics is not None:
+                tags['\xa9lyr'] = [lyrics]
         except:
             pass
         tags['\xa9nam'] = [ytmusic_watch_playlist['tracks'][0]['title']]
