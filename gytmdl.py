@@ -134,7 +134,7 @@ class Gytmdl:
             '-add',
             temp_location,
             '-itags',
-            'title=placeholder',
+            'album=placeholder',
             '-new',
             temp_location_fixed
         ])
