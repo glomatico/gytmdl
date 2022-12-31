@@ -9,11 +9,13 @@ from argparse import ArgumentParser
 import traceback
 
 class Gytmdl:
-    def __init__(self, cookies_location, final_path, temp_path):
+    def __init__(self, cookies_location, itag, final_path, temp_path, skip_cleanup):
         self.ytmusic = YTMusic()
         self.cookies_location = Path(cookies_location)
+        self.itag = itag
         self.final_path = Path(final_path)
         self.temp_path = Path(temp_path)
+        self.skip_cleanup = skip_cleanup
     
 
     def get_ydl_extract_info(self, url):
@@ -54,10 +56,19 @@ class Gytmdl:
         return artist
     
 
-    def get_tags(self, video_id):
+    def get_ytmusic_watch_playlist(self, video_id):
         ytmusic_watch_playlist = self.ytmusic.get_watch_playlist(video_id)
         if not ytmusic_watch_playlist['tracks'][0]['length'] or not ytmusic_watch_playlist['tracks'][0].get('album'):
-            raise Exception('Not a YouTube Music video or track unavailable')
+            return None
+        return ytmusic_watch_playlist
+    
+
+    def search_track(self, title):
+        return self.ytmusic.search(title, 'songs')[0]['videoId']
+    
+
+    def get_tags(self, ytmusic_watch_playlist):
+        video_id = ytmusic_watch_playlist['tracks'][0]['videoId']
         ytmusic_album = self.ytmusic.get_album(ytmusic_watch_playlist['tracks'][0]['album']['id'])
         tags = {}
         tags['\xa9alb'] = [ytmusic_album['title']]
@@ -112,13 +123,13 @@ class Gytmdl:
         return self.final_path / self.get_sanizated_string(tags['aART'][0], True) / self.get_sanizated_string(tags['©alb'][0], True) / (self.get_sanizated_string(f'{tags["trkn"][0][0]:02d} {tags["©nam"][0]}', False) + '.m4a')
     
 
-    def download(self, video_id, temp_location, itag):
+    def download(self, video_id, temp_location):
         ydl_opts = {
             'quiet': True,
             'no_warnings': True,
             'overwrites': True,
             'fixup': 'never',
-            'format': itag,
+            'format': self.itag,
             'outtmpl': str(temp_location)
         }
         if self.cookies_location.exists():
@@ -138,7 +149,7 @@ class Gytmdl:
             '-new',
             temp_location_fixed
         ])
-        final_location.parent.mkdir(exist_ok=True, parents=True)
+        final_location.parent.mkdir(exist_ok = True, parents = True)
         shutil.copy(temp_location_fixed, final_location)
     
 
@@ -150,13 +161,13 @@ class Gytmdl:
     
 
     def cleanup(self):
-        shutil.rmtree(self.temp_path)
+        if not self.skip_cleanup and self.temp_path.exists():
+            shutil.rmtree(self.temp_path)
 
 
 if __name__ == '__main__':
     if not shutil.which('MP4Box'):
-        print('MP4Box is not on PATH.')
-        exit(1)
+        raise Exception('MP4Box is not on PATH.')
     parser = ArgumentParser(description = 'A Python script to download YouTube Music tracks with YouTube Music tags.')
     parser.add_argument(
         'url',
@@ -206,12 +217,12 @@ if __name__ == '__main__':
         help = 'Print exceptions.'
     )
     args = parser.parse_args()
-    gytmdl = Gytmdl(args.cookies_location, args.final_path, args.temp_path)
+    dl = Gytmdl(args.cookies_location, args.itag, args.final_path, args.temp_path, args.skip_cleanup)
     download_queue = []
     error_count = 0
     for i in range(len(args.url)):
         try:
-            download_queue.append(gytmdl.get_download_queue(args.url[i]))
+            download_queue.append(dl.get_download_queue(args.url[i]))
         except KeyboardInterrupt:
             exit(0)
         except:
@@ -226,13 +237,17 @@ if __name__ == '__main__':
         for j in range(len(download_queue[i])):
             print(f'Downloading "{download_queue[i][j]["title"]}" (track {j + 1} from URL {i + 1})...')
             try:
-                tags = gytmdl.get_tags(download_queue[i][j]['video_id'])
-                temp_location = gytmdl.get_temp_location(download_queue[i][j]['video_id'])
-                gytmdl.download(download_queue[i][j]['video_id'], temp_location, args.itag)
-                temp_location_fixed = gytmdl.get_temp_location_fixed(download_queue[i][j]['video_id'])
-                final_location = gytmdl.get_final_location(tags)
-                fixup = gytmdl.fixup(final_location, temp_location, temp_location_fixed)
-                gytmdl.apply_tags(final_location, tags)
+                ytmusic_watch_playlist = dl.get_ytmusic_watch_playlist(download_queue[i][j]['video_id'])
+                if ytmusic_watch_playlist is None:
+                    download_queue[i][j]['video_id'] = dl.search_track(download_queue[i][j]['title'])
+                    ytmusic_watch_playlist = dl.get_ytmusic_watch_playlist(download_queue[i][j]['video_id'])
+                tags = dl.get_tags(ytmusic_watch_playlist)
+                temp_location = dl.get_temp_location(download_queue[i][j]['video_id'])
+                dl.download(download_queue[i][j]['video_id'], temp_location)
+                temp_location_fixed = dl.get_temp_location_fixed(download_queue[i][j]['video_id'])
+                final_location = dl.get_final_location(tags)
+                fixup = dl.fixup(final_location, temp_location, temp_location_fixed)
+                dl.apply_tags(final_location, tags)
             except KeyboardInterrupt:
                 exit(0)
             except:
@@ -240,7 +255,5 @@ if __name__ == '__main__':
                 print(f'* Failed to download "{download_queue[i][j]["title"]}" (track {j + 1} from URL {i + 1}).')
                 if args.print_exceptions:
                     traceback.print_exc()
-            if not args.skip_cleanup:
-                gytmdl.cleanup()
-    print(f'Finished ({error_count} error(s)).')
-        
+            dl.cleanup()
+    print(f'Done ({error_count} error(s)).')
