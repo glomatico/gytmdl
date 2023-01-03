@@ -70,20 +70,22 @@ class Gytmdl:
     def get_tags(self, ytmusic_watch_playlist):
         video_id = ytmusic_watch_playlist['tracks'][0]['videoId']
         ytmusic_album = self.ytmusic.get_album(ytmusic_watch_playlist['tracks'][0]['album']['id'])
-        tags = {}
-        tags['\xa9alb'] = [ytmusic_album['title']]
-        tags['aART'] = [self.get_artist(ytmusic_album['artists'])]
-        tags['\xa9ART'] = [self.get_artist(ytmusic_watch_playlist['tracks'][0]['artists'])]
-        tags['\xa9cmt'] = [f'https://music.youtube.com/watch?v={video_id}']
-        tags['covr'] = [MP4Cover(requests.get(f'{ytmusic_watch_playlist["tracks"][0]["thumbnail"][0]["url"].split("=")[0]}=w600').content, MP4Cover.FORMAT_JPEG)]
+        tags = {
+            '\xa9alb': [ytmusic_album['title']],
+            'aART': [self.get_artist(ytmusic_album['artists'])],
+            '\xa9ART': [self.get_artist(ytmusic_watch_playlist['tracks'][0]['artists'])],
+            '\xa9cmt': [f'https://music.youtube.com/watch?v={video_id}'],
+            'covr': [MP4Cover(requests.get(f'{ytmusic_watch_playlist["tracks"][0]["thumbnail"][0]["url"].split("=")[0]}=w600').content, MP4Cover.FORMAT_JPEG)],
+            '\xa9nam': [ytmusic_watch_playlist['tracks'][0]['title']],
+            '\xa9day': [ytmusic_album['year']],
+            'stik': [1]
+        }
         try:
             lyrics = self.ytmusic.get_lyrics(ytmusic_watch_playlist['lyrics'])['lyrics']
             if lyrics is not None:
                 tags['\xa9lyr'] = [lyrics]
         except:
             pass
-        tags['\xa9nam'] = [ytmusic_watch_playlist['tracks'][0]['title']]
-        tags['\xa9day'] = [ytmusic_album['year']]
         total_tracks = ytmusic_album['trackCount']
         track_number = 1
         for video in self.get_ydl_extract_info(f'https://www.youtube.com/playlist?list={ytmusic_album["audioPlaylistId"]}')['entries']:
@@ -95,7 +97,6 @@ class Gytmdl:
                 break
             track_number += 1
         tags['trkn'] = [(track_number, total_tracks)]
-        tags['stik'] = [1]
         return tags
     
 
@@ -172,8 +173,15 @@ if __name__ == '__main__':
     parser.add_argument(
         'url',
         help='YouTube Music track/album/playlist URL(s).',
-        nargs='+',
+        nargs='*',
         metavar='<url>'
+    )
+    parser.add_argument(
+        '-u',
+        '--urls-txt',
+        help = 'Read URLs from a text file.',
+        nargs = '?',
+        metavar = '<txt_file>'
     )
     parser.add_argument(
         '-i',
@@ -218,11 +226,16 @@ if __name__ == '__main__':
     )
     args = parser.parse_args()
     dl = Gytmdl(args.cookies_location, args.itag, args.final_path, args.temp_path, args.skip_cleanup)
+    if not args.url and not args.urls_txt:
+        parser.error('you must specify an url or a text file using -u/--urls-txt.')
+    if args.urls_txt:
+        with open(args.urls_txt, 'r', encoding = 'utf8') as f:
+            args.url = f.read().splitlines()
     download_queue = []
     error_count = 0
     for i in range(len(args.url)):
         try:
-            download_queue.append(dl.get_download_queue(args.url[i]))
+            download_queue.append(dl.get_download_queue(args.url[i].strip()))
         except KeyboardInterrupt:
             exit(0)
         except:
@@ -230,9 +243,6 @@ if __name__ == '__main__':
             print(f'* Failed to check URL {i + 1}.')
             if args.print_exceptions:
                 traceback.print_exc()
-    if not download_queue:
-        print('* Failed to check all URLs.')
-        exit(1)
     for i in range(len(download_queue)):
         for j in range(len(download_queue[i])):
             print(f'Downloading "{download_queue[i][j]["title"]}" (track {j + 1} from URL {i + 1})...')
