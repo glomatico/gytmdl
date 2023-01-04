@@ -116,7 +116,7 @@ class Gytmdl:
         return self.temp_path / f'{video_id}.m4a'
     
 
-    def get_temp_location_fixed(self, video_id):
+    def get_fixed_location(self, video_id):
         return self.temp_path / f'{video_id}_fixed.m4a'
     
 
@@ -139,7 +139,7 @@ class Gytmdl:
             ydl.download('music.youtube.com/watch?v=' + video_id) 
     
 
-    def fixup(self, final_location, temp_location, temp_location_fixed):
+    def fixup(self, temp_location, fixed_location):
         subprocess.check_output([
             'MP4Box',
             '-quiet',
@@ -148,13 +148,13 @@ class Gytmdl:
             '-itags',
             'album=placeholder',
             '-new',
-            temp_location_fixed
+            fixed_location
         ])
-        final_location.parent.mkdir(exist_ok = True, parents = True)
-        shutil.copy(temp_location_fixed, final_location)
     
 
-    def apply_tags(self, final_location, tags):
+    def make_final(self, final_location, fixed_location, tags):
+        final_location.parent.mkdir(parents = True, exist_ok = True)
+        shutil.copy(fixed_location, final_location)
         file = MP4(final_location).tags
         for key, value in tags.items():
             file[key] = value
@@ -225,7 +225,13 @@ if __name__ == '__main__':
         help = 'Print exceptions.'
     )
     args = parser.parse_args()
-    dl = Gytmdl(args.cookies_location, args.itag, args.final_path, args.temp_path, args.skip_cleanup)
+    dl = Gytmdl(
+        args.cookies_location, 
+        args.itag, 
+        args.final_path, 
+        args.temp_path, 
+        args.skip_cleanup
+    )
     if not args.url and not args.urls_txt:
         parser.error('you must specify an url or a text file using -u/--urls-txt.')
     if args.urls_txt:
@@ -233,36 +239,36 @@ if __name__ == '__main__':
             args.url = f.read().splitlines()
     download_queue = []
     error_count = 0
-    for i in range(len(args.url)):
+    for i, url in enumerate(args.url):
         try:
-            download_queue.append(dl.get_download_queue(args.url[i].strip()))
+            download_queue.append(dl.get_download_queue(url.strip()))
         except KeyboardInterrupt:
-            exit(0)
+            exit(1)
         except:
             error_count += 1
             print(f'* Failed to check URL {i + 1}.')
             if args.print_exceptions:
                 traceback.print_exc()
-    for i in range(len(download_queue)):
-        for j in range(len(download_queue[i])):
-            print(f'Downloading "{download_queue[i][j]["title"]}" (track {j + 1} from URL {i + 1})...')
+    for i, url in enumerate(download_queue):
+        for j, track in enumerate(download_queue[i]):
+            print(f'Downloading "{track["title"]}" (track {j + 1} from URL {i + 1})...')
             try:
-                ytmusic_watch_playlist = dl.get_ytmusic_watch_playlist(download_queue[i][j]['video_id'])
+                ytmusic_watch_playlist = dl.get_ytmusic_watch_playlist(track['video_id'])
                 if ytmusic_watch_playlist is None:
-                    download_queue[i][j]['video_id'] = dl.search_track(download_queue[i][j]['title'])
-                    ytmusic_watch_playlist = dl.get_ytmusic_watch_playlist(download_queue[i][j]['video_id'])
+                    track['video_id'] = dl.search_track(track['title'])
+                    ytmusic_watch_playlist = dl.get_ytmusic_watch_playlist(track['video_id'])
                 tags = dl.get_tags(ytmusic_watch_playlist)
-                temp_location = dl.get_temp_location(download_queue[i][j]['video_id'])
-                dl.download(download_queue[i][j]['video_id'], temp_location)
-                temp_location_fixed = dl.get_temp_location_fixed(download_queue[i][j]['video_id'])
+                temp_location = dl.get_temp_location(track['video_id'])
+                dl.download(track['video_id'], temp_location)
+                fixed_location = dl.get_fixed_location(track['video_id'])
+                dl.fixup(temp_location, fixed_location)
                 final_location = dl.get_final_location(tags)
-                fixup = dl.fixup(final_location, temp_location, temp_location_fixed)
-                dl.apply_tags(final_location, tags)
+                dl.make_final(final_location, fixed_location, tags)
             except KeyboardInterrupt:
-                exit(0)
+                exit(1)
             except:
                 error_count += 1
-                print(f'* Failed to download "{download_queue[i][j]["title"]}" (track {j + 1} from URL {i + 1}).')
+                print(f'* Failed to download "{track["title"]}" (track {j + 1} from URL {i + 1}).')
                 if args.print_exceptions:
                     traceback.print_exc()
             dl.cleanup()
