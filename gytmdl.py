@@ -1,12 +1,13 @@
-from ytmusicapi import YTMusic
+import shutil
+import argparse
+import traceback
+import subprocess
 from pathlib import Path
+from ytmusicapi import YTMusic
 from yt_dlp import YoutubeDL
 import requests
-import subprocess
 from mutagen.mp4 import MP4, MP4Cover
-import shutil
-from argparse import ArgumentParser
-import traceback
+
 
 class Gytmdl:
     def __init__(self, cookies_location, itag, final_path, temp_path, skip_cleanup):
@@ -169,7 +170,10 @@ class Gytmdl:
 if __name__ == '__main__':
     if not shutil.which('MP4Box'):
         raise Exception('MP4Box is not on PATH.')
-    parser = ArgumentParser(description = 'A Python script to download YouTube Music tracks with YouTube Music tags.')
+    parser = argparse.ArgumentParser(
+        description = 'A Python script to download YouTube Music tracks with YouTube Music tags.',
+        formatter_class = argparse.ArgumentDefaultsHelpFormatter
+    )
     parser.add_argument(
         'url',
         help='YouTube Music track/album/playlist URL(s).',
@@ -180,37 +184,32 @@ if __name__ == '__main__':
         '-u',
         '--urls-txt',
         help = 'Read URLs from a text file.',
-        nargs = '?',
-        metavar = '<txt_file>'
+        nargs = '?'
     )
     parser.add_argument(
         '-i',
         '--itag',
         default = '140',
         choices = ['141', '140'],
-        help = 'Itag (quality). Valid itags are 141 (256kbps AAC m4a) and 140 (128kbps AAC m4a).',
-        metavar = '<itag>'
+        help = 'Itag (quality). Valid itags are 141 (256kbps AAC m4a) and 140 (128kbps AAC m4a).'
     )
     parser.add_argument(
         '-t',
         '--temp-path',
         default = 'temp',
-        help = 'Temp path.',
-        metavar = '<temp_path>'
+        help = 'Temp path.'
     )
     parser.add_argument(
         '-f',
         '--final-path',
         default = 'YouTube Music',
-        help = 'Final path.',
-        metavar = '<final_path>'
+        help = 'Final path.'
     )
     parser.add_argument(
         '-c',
         '--cookies-location',
         default = 'cookies.txt',
-        help = 'Cookies location.',
-        metavar = '<cookies_location>'
+        help = 'Cookies location.'
     )
     parser.add_argument(
         '-s',
@@ -219,7 +218,7 @@ if __name__ == '__main__':
         help = 'Skip cleanup.'
     )
     parser.add_argument(
-        '-p',
+        '-e',
         '--print-exceptions',
         action = 'store_true',
         help = 'Print exceptions.'
