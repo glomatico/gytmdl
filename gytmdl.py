@@ -3,6 +3,7 @@ import argparse
 import traceback
 import subprocess
 from pathlib import Path
+import functools
 from ytmusicapi import YTMusic
 from yt_dlp import YoutubeDL
 import requests
@@ -10,15 +11,16 @@ from mutagen.mp4 import MP4, MP4Cover
 
 
 class Gytmdl:
-    def __init__(self, cookies_location, itag, final_path, temp_path, skip_cleanup):
+    def __init__(self, cookies_location, premium_quality, final_path, temp_path, skip_cleanup):
         self.ytmusic = YTMusic()
         self.cookies_location = Path(cookies_location)
-        self.itag = itag
+        self.itag = '141' if premium_quality else '140'
         self.final_path = Path(final_path)
         self.temp_path = Path(temp_path)
         self.skip_cleanup = skip_cleanup
     
 
+    @functools.lru_cache()
     def get_ydl_extract_info(self, url):
         with YoutubeDL({
             'quiet': True,
@@ -67,6 +69,16 @@ class Gytmdl:
     def search_track(self, title):
         return self.ytmusic.search(title, 'songs')[0]['videoId']
     
+    
+    @functools.lru_cache()
+    def get_ytmusic_album(self, browse_id):
+        return self.ytmusic.get_album(browse_id)
+    
+
+    @functools.lru_cache()
+    def get_cover(self, url):
+        return requests.get(url).content
+    
 
     def get_tags(self, ytmusic_watch_playlist):
         video_id = ytmusic_watch_playlist['tracks'][0]['videoId']
@@ -76,7 +88,7 @@ class Gytmdl:
             'aART': [self.get_artist(ytmusic_album['artists'])],
             '\xa9ART': [self.get_artist(ytmusic_watch_playlist['tracks'][0]['artists'])],
             '\xa9cmt': [f'https://music.youtube.com/watch?v={video_id}'],
-            'covr': [MP4Cover(requests.get(f'{ytmusic_watch_playlist["tracks"][0]["thumbnail"][0]["url"].split("=")[0]}=w600').content, MP4Cover.FORMAT_JPEG)],
+            'covr': [MP4Cover(self.get_cover(f'{ytmusic_watch_playlist["tracks"][0]["thumbnail"][0]["url"].split("=")[0]}=w600'), MP4Cover.FORMAT_JPEG)],
             '\xa9nam': [ytmusic_watch_playlist['tracks'][0]['title']],
             '\xa9day': [ytmusic_album['year']],
             'stik': [1]
@@ -187,13 +199,6 @@ if __name__ == '__main__':
         nargs = '?'
     )
     parser.add_argument(
-        '-i',
-        '--itag',
-        default = '140',
-        choices = ['141', '140'],
-        help = 'Itag (quality). Valid itags are 141 (256kbps AAC m4a) and 140 (128kbps AAC m4a).'
-    )
-    parser.add_argument(
         '-t',
         '--temp-path',
         default = 'temp',
@@ -212,6 +217,12 @@ if __name__ == '__main__':
         help = 'Cookies location.'
     )
     parser.add_argument(
+        '-p',
+        '--premium-quality',
+        action = 'store_true',
+        help = 'Download AAC 256kbps instead of AAC 128kbps.'
+    )
+    parser.add_argument(
         '-s',
         '--skip-cleanup',
         action = 'store_true',
@@ -226,7 +237,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     dl = Gytmdl(
         args.cookies_location, 
-        args.itag, 
+        args.premium_quality, 
         args.final_path, 
         args.temp_path, 
         args.skip_cleanup
