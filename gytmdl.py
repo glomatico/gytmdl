@@ -38,24 +38,17 @@ class Gytmdl:
         if 'MPREb_' in ydl_extract_info['webpage_url_basename']:
             ydl_extract_info = self.get_ydl_extract_info(ydl_extract_info['url'])
         if 'playlist' in ydl_extract_info['webpage_url_basename']:
-            for video in ydl_extract_info['entries']:
-                download_info.append({
-                    'title': video['title'],
-                    'video_id': video['id']
-                })
+            download_info.extend(ydl_extract_info['entries'])
         if 'watch' in ydl_extract_info['webpage_url_basename']:
-            download_info.append({
-                'title': ydl_extract_info['title'],
-                'video_id': ydl_extract_info['id']
-            })
+            download_info.append(ydl_extract_info)
         return download_info
     
 
-    def get_artist(self, ytmusic_artist):
-        if len(ytmusic_artist) == 1:
-            return ytmusic_artist[0]['name']
-        artist = ', '.join([artist['name'] for artist in ytmusic_artist][:-1])
-        artist += f' & {ytmusic_artist[-1]["name"]}'
+    def get_artist(self, artist_list):
+        if len(artist_list) == 1:
+            return artist_list[0]['name']
+        artist = ', '.join([i['name'] for i in artist_list][:-1])
+        artist += f' & {artist_list[-1]["name"]}'
         return artist
     
 
@@ -263,14 +256,14 @@ if __name__ == '__main__':
         for j, track in enumerate(download_queue[i]):
             print(f'Downloading "{track["title"]}" (track {j + 1} from URL {i + 1})...')
             try:
-                ytmusic_watch_playlist = dl.get_ytmusic_watch_playlist(track['video_id'])
+                ytmusic_watch_playlist = dl.get_ytmusic_watch_playlist(track['id'])
                 if ytmusic_watch_playlist is None:
-                    track['video_id'] = dl.search_track(track['title'])
-                    ytmusic_watch_playlist = dl.get_ytmusic_watch_playlist(track['video_id'])
+                    track['id'] = dl.search_track(track['title'])
+                    ytmusic_watch_playlist = dl.get_ytmusic_watch_playlist(track['id'])
                 tags = dl.get_tags(ytmusic_watch_playlist)
-                temp_location = dl.get_temp_location(track['video_id'])
-                dl.download(track['video_id'], temp_location)
-                fixed_location = dl.get_fixed_location(track['video_id'])
+                temp_location = dl.get_temp_location(track['id'])
+                dl.download(track['id'], temp_location)
+                fixed_location = dl.get_fixed_location(track['id'])
                 dl.fixup(temp_location, fixed_location)
                 final_location = dl.get_final_location(tags)
                 dl.make_final(final_location, fixed_location, tags)
