@@ -1,5 +1,5 @@
 /*
-!.gitignore
-!gytmdl.py
+__pycache__
+!gytmdl
 !requirements.txt
-!README.md
+!pyproject.toml

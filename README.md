@@ -1,20 +1,40 @@
 # Glomatico's YouTube Music Downloader
-A Python script to download YouTube Music songs/albums/playlists in 128kbps/256kbps AAC with YouTube Music tags and following the iTunes standard.
+Download YouTube Music songs/albums/playlists with tags from YouTube Music in 128kbps/256kbps AAC and following the iTunes standard.
 
 ## Setup
 1. Install Python 3.8 or higher
-2. Install the required packages using pip: 
+2. Install gytmdl with pip
     ```
-    pip install -r requirements.txt
+    pip install gytmdl
     ```
-3. Add MP4Box to your PATH. You can get MP4Box here: https://gpac.wp.imt.fr/downloads/
-5. (Optional) Get your cookies.txt
-    * With cookies.txt, you can download age restricted tracks, private playlists and songs in 256kbps AAC using `--premium-quality` argument. You can export your cookies by using the following Google Chrome extension on YouTube Music website with your account logged in: https://chrome.google.com/webstore/detail/gdocmgbfkjnnpapoeobnolbbkoibbcif. Make sure to export it as `cookies.txt` to the same directory as the script or specify the location using `--cookies-location` argument.
+3. Add MP4Box to your PATH. You can get it from here: https://gpac.wp.imt.fr/downloads/
+4. (optional) Get your cookies.txt
+    * With cookies.txt, you can download age restricted tracks, private playlists and songs in 256kbps AAC using `--premium-quality` argument if you are a premium user. You can export your cookies by using the following Google Chrome extension on YouTube Music website with your account logged in: https://chrome.google.com/webstore/detail/gdocmgbfkjnnpapoeobnolbbkoibbcif. Make sure to export it as `cookies.txt` to the same folder that you will run the script.
 
 ## Usage
 ```
-python gytmdl.py [OPTIONS] [URLS]
-```
-Tracks are saved in `./YouTube Music` by default, but the directory can be changed using `--final-path` argument.
+usage: gytmdl [-h] [-u [URLS_TXT]] [-t TEMP_PATH] [-f FINAL_PATH] [-c COOKIES_LOCATION] [-p] [-s] [-e] [-v]
+              [<url> ...]
 
-Use `--help` argument to see all available options.
+Download YouTube Music songs/albums/playlists with tags from YouTube Music in 128kbps/256kbps AAC
+
+positional arguments:
+  <url>                 YouTube Music song/album/playlist URL(s) (default: None)
+
+options:
+  -h, --help            show this help message and exit
+  -u [URLS_TXT], --urls-txt [URLS_TXT]
+                        Read URLs from a text file (default: None)
+  -t TEMP_PATH, --temp-path TEMP_PATH
+                        Temp path (default: temp)
+  -f FINAL_PATH, --final-path FINAL_PATH
+                        Final path (default: YouTube Music)
+  -c COOKIES_LOCATION, --cookies-location COOKIES_LOCATION
+                        Cookies location (default: cookies.txt)
+  -p, --premium-quality
+                        Download 256kbps AAC instead of 128kbps AAC (default: False)
+  -s, --skip-cleanup    Skip cleanup (default: False)
+  -e, --print-exceptions
+                        Print exceptions (default: False)
+  -v, --version         show program's version number and exit
+```
