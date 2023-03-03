@@ -5,6 +5,8 @@ on:
     
     # Workflow will run when a release has been published for the package
     release:
+        branches:
+            - master
         types:
             - published
 
