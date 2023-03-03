@@ -9,12 +9,13 @@ from mutagen.mp4 import MP4, MP4Cover
 
 
 class Gytmdl:
-    def __init__(self, cookies_location, premium_quality, final_path, temp_path, skip_cleanup):
+    def __init__(self, cookies_location, itag, final_path, temp_path, overwrite, skip_cleanup):
         self.ytmusic = YTMusic()
         self.cookies_location = Path(cookies_location)
-        self.itag = '141' if premium_quality else '140'
+        self.itag = itag
         self.final_path = Path(final_path)
         self.temp_path = Path(temp_path)
+        self.overwrite = overwrite
         self.skip_cleanup = skip_cleanup
     
 
@@ -117,7 +118,7 @@ class Gytmdl:
 
     
     def get_temp_location(self, video_id):
-        return self.temp_path / f'{video_id}.m4a'
+        return self.temp_path / f'{video_id}.mp4'
     
 
     def get_fixed_location(self, video_id):
@@ -132,7 +133,7 @@ class Gytmdl:
         ydl_opts = {
             'quiet': True,
             'no_warnings': True,
-            'overwrites': True,
+            'overwrites': self.overwrite,
             'fixup': 'never',
             'format': self.itag,
             'outtmpl': str(temp_location)
@@ -144,14 +145,23 @@ class Gytmdl:
     
 
     def fixup(self, temp_location, fixed_location):
+        fixup = [
+            'ffmpeg',
+            '-loglevel',
+            'error',
+            '-i',
+            temp_location
+        ]
+        if self.itag == '251':
+            fixup.extend([
+                '-f',
+                'mp4'
+            ])
         subprocess.run(
             [
-                'MP4Box',
-                '-quiet',
-                '-add',
-                temp_location,
-                '-itags',
-                'artist=placeholder',
+                *fixup,
+                '-c',
+                'copy',
                 fixed_location
             ],
             check = True
@@ -161,7 +171,8 @@ class Gytmdl:
     def make_final(self, final_location, fixed_location, tags):
         final_location.parent.mkdir(parents = True, exist_ok = True)
         shutil.copy(fixed_location, final_location)
-        file = MP4(final_location).tags
+        file = MP4(final_location)
+        file.clear()
         file.update(tags)
         file.save(final_location)
     

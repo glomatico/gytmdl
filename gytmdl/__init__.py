@@ -3,14 +3,14 @@ import argparse
 import traceback
 from .gytmdl import Gytmdl
 
-__version__ = '1.0'
+__version__ = '1.1'
 
 
 def main():
-    if not shutil.which('MP4Box'):
-        raise Exception('MP4Box is not on PATH.')
+    if not shutil.which('ffmpeg'):
+        raise Exception('ffmpeg is not on PATH')
     parser = argparse.ArgumentParser(
-        description = 'Download YouTube Music songs/albums/playlists with tags from YouTube Music in 128kbps/256kbps AAC',
+        description = 'Download YouTube Music songs/albums/playlists with tags from YouTube Music',
         formatter_class = argparse.ArgumentDefaultsHelpFormatter
     )
     parser.add_argument(
@@ -44,10 +44,17 @@ def main():
         help = 'Cookies location'
     )
     parser.add_argument(
-        '-p',
-        '--premium-quality',
+        '-i',
+        '--itag',
+        default = '140',
+        help = 'itag (quality). Can be 141 (256kbps AAC, requires cookies), 251 (128kbps Opus) or 140 (128kbps AAC)',
+        choices = ['141', '251', '140']
+    )
+    parser.add_argument(
+        '-o',
+        '--overwrite',
         action = 'store_true',
-        help = 'Download 256kbps AAC instead of 128kbps AAC'
+        help = 'Overwrite existing files'
     )
     parser.add_argument(
         '-s',
@@ -69,10 +76,11 @@ def main():
     )
     args = parser.parse_args()
     dl = Gytmdl(
-        args.cookies_location, 
-        args.premium_quality, 
-        args.final_path, 
-        args.temp_path, 
+        args.cookies_location,
+        args.itag,
+        args.final_path,
+        args.temp_path,
+        args.overwrite,
         args.skip_cleanup
     )
     if not args.url and not args.urls_txt:
@@ -89,30 +97,32 @@ def main():
             exit(1)
         except:
             error_count += 1
-            print(f'* Failed to check URL {i + 1}.')
+            print(f'Failed to check URL {i + 1}/{len(args.url)}')
             if args.print_exceptions:
                 traceback.print_exc()
     for i, url in enumerate(download_queue):
         for j, track in enumerate(url):
-            print(f'Downloading "{track["title"]}" (track {j + 1} from URL {i + 1})...')
+            print(f'Downloading "{track["title"]}" (track {j + 1}/{len(url)} from URL {i + 1}/{len(download_queue)})')
             try:
                 ytmusic_watch_playlist = dl.get_ytmusic_watch_playlist(track['id'])
                 if ytmusic_watch_playlist is None:
                     track['id'] = dl.search_track(track['title'])
                     ytmusic_watch_playlist = dl.get_ytmusic_watch_playlist(track['id'])
                 tags = dl.get_tags(ytmusic_watch_playlist)
+                final_location = dl.get_final_location(tags)
+                if final_location.exists() and not args.overwrite:
+                    continue
                 temp_location = dl.get_temp_location(track['id'])
                 dl.download(track['id'], temp_location)
                 fixed_location = dl.get_fixed_location(track['id'])
                 dl.fixup(temp_location, fixed_location)
-                final_location = dl.get_final_location(tags)
                 dl.make_final(final_location, fixed_location, tags)
             except KeyboardInterrupt:
                 exit(1)
             except:
                 error_count += 1
-                print(f'* Failed to download "{track["title"]}" (track {j + 1} from URL {i + 1}).')
+                print(f'Failed to download "{track["title"]}" (track {j + 1}/{len(url)}) from URL {i + 1}/{len(download_queue)})')
                 if args.print_exceptions:
                     traceback.print_exc()
             dl.cleanup()
-    print(f'Done ({error_count} error(s)).')
+    print(f'Done ({error_count} error(s))')
