@@ -121,7 +121,7 @@ def main():
                 exit(1)
             except:
                 error_count += 1
-                print(f'Failed to download "{track["title"]}" (track {j + 1}/{len(url)}) from URL {i + 1}/{len(download_queue)})')
+                print(f'Failed to download "{track["title"]}" (track {j + 1}/{len(url)} from URL {i + 1}/{len(download_queue)})')
                 if args.print_exceptions:
                     traceback.print_exc()
             dl.cleanup()
