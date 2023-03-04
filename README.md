@@ -8,7 +8,7 @@ Download YouTube Music songs/albums/playlists with tags from YouTube Music in 12
     pip install gytmdl
     ```
 3. Add FFMPEG to your PATH. You can get it from here: https://ffmpeg.org/download.html
-  * If you are on Windows you can move the `ffmpeg.exe` file to the same folder that you will run the script instead of adding it to your PATH.
+    * If you are on Windows you can move the `ffmpeg.exe` file to the same folder that you will run the script instead of adding it to your PATH.
 4. (optional) Get your cookies.txt
     * With cookies.txt, you can download age restricted tracks, private playlists and songs in 256kbps AAC using `--itag 141` argument if you are a premium user. You can export your cookies by using the following Google Chrome extension on YouTube Music website with your account logged in: https://chrome.google.com/webstore/detail/gdocmgbfkjnnpapoeobnolbbkoibbcif. Make sure to export it as `cookies.txt` to the same folder that you will run the script.
 
