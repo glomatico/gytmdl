@@ -82,15 +82,14 @@ class Gytmdl:
             '\xa9cmt': [f'https://music.youtube.com/watch?v={video_id}'],
             'covr': [MP4Cover(self.get_cover(f'{ytmusic_watch_playlist["tracks"][0]["thumbnail"][0]["url"].split("=")[0]}=w600'), MP4Cover.FORMAT_JPEG)],
             '\xa9nam': [ytmusic_watch_playlist['tracks'][0]['title']],
-            '\xa9day': [ytmusic_album['year']],
             'stik': [1]
         }
-        try:
-            lyrics = self.ytmusic.get_lyrics(ytmusic_watch_playlist['lyrics'])['lyrics']
+        if ytmusic_album.get('year'):
+            tags['\xa9day'] = [ytmusic_album['year']]
+        if ytmusic_watch_playlist['lyrics']:
+            lyrics = self.ytmusic.get_lyrics(ytmusic_watch_playlist['lyrics'])['lyrics']        
             if lyrics is not None:
                 tags['\xa9lyr'] = [lyrics]
-        except:
-            pass
         total_tracks = ytmusic_album['trackCount']
         track_number = 1
         for video in self.get_ydl_extract_info(f'https://www.youtube.com/playlist?list={ytmusic_album["audioPlaylistId"]}')['entries']:
