@@ -53,7 +53,9 @@ class Gytmdl:
 
     def get_ytmusic_watch_playlist(self, video_id):
         ytmusic_watch_playlist = self.ytmusic.get_watch_playlist(video_id)
-        if not ytmusic_watch_playlist['tracks'][0]['length'] or not ytmusic_watch_playlist['tracks'][0].get('album'):
+        if not ytmusic_watch_playlist['tracks'][0]['length'] and ytmusic_watch_playlist['tracks'][0].get('album'):
+            raise Exception('Track is not available')
+        if not ytmusic_watch_playlist['tracks'][0].get('album'):
             return None
         return ytmusic_watch_playlist
     
