@@ -3,7 +3,7 @@ import argparse
 import traceback
 from .gytmdl import Gytmdl
 
-__version__ = '1.2'
+__version__ = '1.3'
 
 
 def main():
