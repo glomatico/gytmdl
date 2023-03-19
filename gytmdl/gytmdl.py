@@ -21,11 +21,14 @@ class Gytmdl:
 
     @functools.lru_cache()
     def get_ydl_extract_info(self, url):
-        with YoutubeDL({
+        ydl_opts = {
             'quiet': True,
             'no_warnings': True,
             'extract_flat': True
-        }) as ydl:
+        }
+        if self.cookies_location.exists():
+            ydl_opts['cookiefile'] = str(self.cookies_location)
+        with YoutubeDL(ydl_opts) as ydl:
             return ydl.extract_info(url, download = False)
     
 
