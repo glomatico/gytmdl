@@ -33,6 +33,7 @@ class Gytmdl:
     
 
     def get_download_queue(self, url):
+        url = url.split('&')[0]
         download_info = []
         ydl_extract_info = self.get_ydl_extract_info(url)
         if not 'youtube' in ydl_extract_info['webpage_url']:
