@@ -3,76 +3,76 @@ import argparse
 import traceback
 from .gytmdl import Gytmdl
 
-__version__ = '1.3'
+__version__ = '1.4'
 
 
 def main():
     if not shutil.which('ffmpeg'):
         raise Exception('ffmpeg is not on PATH')
     parser = argparse.ArgumentParser(
-        description = 'Download YouTube Music songs/albums/playlists with tags from YouTube Music',
-        formatter_class = argparse.ArgumentDefaultsHelpFormatter
+        description='Download YouTube Music songs/albums/playlists with tags from YouTube Music',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument(
         'url',
         help='YouTube Music song/album/playlist URL(s)',
         nargs='*',
-        metavar='<url>'
+        metavar='<url>',
     )
     parser.add_argument(
         '-u',
         '--urls-txt',
-        help = 'Read URLs from a text file',
-        nargs = '?'
+        help='Read URLs from a text file',
+        nargs='?',
     )
     parser.add_argument(
         '-t',
         '--temp-path',
-        default = 'temp',
-        help = 'Temp path'
+        default='temp',
+        help='Temp path',
     )
     parser.add_argument(
         '-f',
         '--final-path',
-        default = 'YouTube Music',
-        help = 'Final path'
+        default='YouTube Music',
+        help='Final path',
     )
     parser.add_argument(
         '-c',
         '--cookies-location',
-        default = 'cookies.txt',
-        help = 'Cookies location'
+        default='cookies.txt',
+        help='Cookies location',
     )
     parser.add_argument(
         '-i',
         '--itag',
-        default = '140',
-        help = 'itag (quality). Can be 141 (256kbps AAC, requires cookies), 251 (128kbps Opus) or 140 (128kbps AAC)',
-        choices = ['141', '251', '140']
+        default='140',
+        help='itag (quality). Can be 141 (256kbps AAC, requires cookies), 251 (128kbps Opus) or 140 (128kbps AAC)',
+        choices=['141', '251', '140'],
     )
     parser.add_argument(
         '-o',
         '--overwrite',
-        action = 'store_true',
-        help = 'Overwrite existing files'
+        action='store_true',
+        help='Overwrite existing files',
     )
     parser.add_argument(
         '-s',
         '--skip-cleanup',
-        action = 'store_true',
-        help = 'Skip cleanup'
+        action='store_true',
+        help='Skip cleanup',
     )
     parser.add_argument(
         '-e',
         '--print-exceptions',
-        action = 'store_true',
-        help = 'Print exceptions'
+        action='store_true',
+        help='Print exceptions',
     )
     parser.add_argument(
         '-v',
         '--version',
-        action = 'version',
-        version = f'%(prog)s {__version__}'
+        action='version',
+        version=f'%(prog)s {__version__}',
     )
     args = parser.parse_args()
     dl = Gytmdl(
@@ -81,12 +81,12 @@ def main():
         args.final_path,
         args.temp_path,
         args.overwrite,
-        args.skip_cleanup
+        args.skip_cleanup,
     )
     if not args.url and not args.urls_txt:
         parser.error('you must specify an url or a text file using -u/--urls-txt.')
     if args.urls_txt:
-        with open(args.urls_txt, 'r', encoding = 'utf8') as f:
+        with open(args.urls_txt, 'r', encoding='utf8') as f:
             args.url = f.read().splitlines()
     download_queue = []
     error_count = 0

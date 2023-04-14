@@ -24,12 +24,12 @@ class Gytmdl:
         ydl_opts = {
             'quiet': True,
             'no_warnings': True,
-            'extract_flat': True
+            'extract_flat': True,
         }
         if self.cookies_location.exists():
             ydl_opts['cookiefile'] = str(self.cookies_location)
         with YoutubeDL(ydl_opts) as ydl:
-            return ydl.extract_info(url, download = False)
+            return ydl.extract_info(url, download=False)
     
 
     def get_download_queue(self, url):
@@ -85,9 +85,9 @@ class Gytmdl:
             'aART': [self.get_artist(ytmusic_album['artists'])],
             '\xa9ART': [self.get_artist(ytmusic_watch_playlist['tracks'][0]['artists'])],
             '\xa9cmt': [f'https://music.youtube.com/watch?v={video_id}'],
-            'covr': [MP4Cover(self.get_cover(f'{ytmusic_watch_playlist["tracks"][0]["thumbnail"][0]["url"].split("=")[0]}=w600'), MP4Cover.FORMAT_JPEG)],
+            'covr': [MP4Cover(self.get_cover(f'{ytmusic_watch_playlist["tracks"][0]["thumbnail"][0]["url"].split("=")[0]}=w600'))],
             '\xa9nam': [ytmusic_watch_playlist['tracks'][0]['title']],
-            'stik': [1]
+            'stik': [1],
         }
         if ytmusic_album.get('year'):
             tags['\xa9day'] = [ytmusic_album['year']]
@@ -140,7 +140,7 @@ class Gytmdl:
             'overwrites': self.overwrite,
             'fixup': 'never',
             'format': self.itag,
-            'outtmpl': str(temp_location)
+            'outtmpl': str(temp_location),
         }
         if self.cookies_location.exists():
             ydl_opts['cookiefile'] = str(self.cookies_location)
@@ -154,26 +154,26 @@ class Gytmdl:
             '-loglevel',
             'error',
             '-i',
-            temp_location
+            temp_location,
         ]
         if self.itag == '251':
             fixup.extend([
                 '-f',
-                'mp4'
+                'mp4',
             ])
         subprocess.run(
             [
                 *fixup,
                 '-c',
                 'copy',
-                fixed_location
+                fixed_location,
             ],
-            check = True
+            check=True,
         )
     
 
     def make_final(self, final_location, fixed_location, tags):
-        final_location.parent.mkdir(parents = True, exist_ok = True)
+        final_location.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy(fixed_location, final_location)
         file = MP4(final_location)
         file.clear()
