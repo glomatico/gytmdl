@@ -1,5 +1,8 @@
 # Glomatico's YouTube Music Downloader
-Download YouTube Music songs/albums/playlists with tags from YouTube Music in 128kbps AAC/128kbps Opus/256kbps AAC and following the iTunes standard.
+Download YouTube Music songs/albums/playlists with tags from YouTube Music in 256kbps AAC/128kbps Opus/128kbps AAC.
+
+## Why not just use yt-dlp directly?
+While this project uses yt-dlp under the hood to download songs from YouTube Music, it has the advantage of utilizing [YouTube Music's API](https://github.com/sigma67/ytmusicapi) to get songs metadata, ensuring that you get the correct tags for your songs. This includes information such as track number, square cover, lyrics, year, etc.
 
 ## Setup
 1. Install Python 3.8 or higher
