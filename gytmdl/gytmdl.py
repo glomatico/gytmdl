@@ -86,7 +86,7 @@ class Gytmdl:
             'aART': [self.get_artist(ytmusic_album['artists'])],
             '\xa9ART': [self.get_artist(ytmusic_watch_playlist['tracks'][0]['artists'])],
             '\xa9cmt': [f'https://music.youtube.com/watch?v={video_id}'],
-            'covr': [MP4Cover(self.get_cover(f'{ytmusic_watch_playlist["tracks"][0]["thumbnail"][0]["url"].split("=")[0]}=w600'))],
+            'covr': [MP4Cover(self.get_cover(f'{ytmusic_watch_playlist["tracks"][0]["thumbnail"][0]["url"].split("=")[0]}=w1200-l94'))],
             '\xa9nam': [ytmusic_watch_playlist['tracks'][0]['title']],
             'stik': [1],
         }
