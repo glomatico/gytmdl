@@ -25,7 +25,7 @@ def main():
         "-u",
         "--urls-txt",
         help="Read URLs from a text file",
-        nargs="?",
+        action="store_true",
     )
     parser.add_argument(
         "-t",
@@ -85,11 +85,12 @@ def main():
         args.overwrite,
         args.skip_cleanup,
     )
-    if not args.url and not args.urls_txt:
-        parser.error("you must specify an url or a text file using -u/--urls-txt.")
     if args.urls_txt:
-        with open(args.urls_txt, "r", encoding="utf8") as f:
-            args.url = f.read().splitlines()
+        _url = []
+        for url_txt in args.url:
+            with open(url_txt, "r", encoding="utf8") as f:
+                _url.extend(f.read().splitlines())
+        args.url = _url
     download_queue = []
     error_count = 0
     for i, url in enumerate(args.url):
