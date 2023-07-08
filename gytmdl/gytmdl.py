@@ -12,7 +12,12 @@ from ytmusicapi import YTMusic
 
 class Gytmdl:
     def __init__(
-        self, cookies_location, itag, final_path, temp_path, overwrite, skip_cleanup
+        self,
+        cookies_location,
+        itag,
+        final_path,
+        temp_path,
+        overwrite,
     ):
         self.ytmusic = YTMusic()
         self.cookies_location = Path(cookies_location)
@@ -20,7 +25,6 @@ class Gytmdl:
         self.final_path = Path(final_path)
         self.temp_path = Path(temp_path)
         self.overwrite = overwrite
-        self.skip_cleanup = skip_cleanup
 
     @functools.lru_cache()
     def get_ydl_extract_info(self, url):
@@ -196,5 +200,4 @@ class Gytmdl:
         file.save(final_location)
 
     def cleanup(self):
-        if not self.skip_cleanup and self.temp_path.exists():
-            shutil.rmtree(self.temp_path)
+        shutil.rmtree(self.temp_path)
