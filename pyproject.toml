@@ -2,11 +2,8 @@
 name = "gytmdl"
 description = "Download YouTube Music songs/albums/playlists with tags from YouTube Music"
 requires-python = ">=3.8"
-authors = [{name = "glomatico"}]
-dependencies = [
-    "yt-dlp",
-    "ytmusicapi"
-]
+authors = [{ name = "glomatico" }]
+dependencies = ["click", "yt-dlp", "ytmusicapi"]
 readme = "README.md"
 dynamic = ["version"]
 
@@ -18,4 +15,4 @@ requires = ["flit_core"]
 build-backend = "flit_core.buildapi"
 
 [project.scripts]
-gytmdl = "gytmdl:main"
+gytmdl = "gytmdl.cli:cli"

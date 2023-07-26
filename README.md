@@ -2,7 +2,7 @@
 Download YouTube Music songs/albums/playlists with tags from YouTube Music in 256kbps AAC/128kbps Opus/128kbps AAC.
 
 ## Why not just use yt-dlp directly?
-While this project uses yt-dlp under the hood to download songs from YouTube Music, it has the advantage of utilizing [YouTube Music's API](https://github.com/sigma67/ytmusicapi) to get songs metadata, ensuring that you get the correct tags for your songs. This includes information such as track number, square cover, lyrics, year, etc.
+While this project uses yt-dlp under the hood, it has the advantage of utilizing [YouTube Music's API](https://github.com/sigma67/ytmusicapi) to get songs metadata. This includes information such as track number, square cover, lyrics, year, etc.
 
 ## Setup
 1. Install Python 3.8 or higher
@@ -10,38 +10,37 @@ While this project uses yt-dlp under the hood to download songs from YouTube Mus
     ```
     pip install gytmdl
     ```
-3. Add FFMPEG to your PATH. You can get it from here: https://ffmpeg.org/download.html
-    * If you are on Windows you can move the `ffmpeg.exe` file to the same folder that you will run the script instead of adding it to your PATH.
-4. (optional) Get your cookies.txt
-    * With cookies.txt, you can download age restricted tracks, private playlists and songs in 256kbps AAC using `--itag 141` argument if you are a premium user. You can export your cookies by using the following Google Chrome extension on YouTube Music website with your account logged in: https://chrome.google.com/webstore/detail/gdocmgbfkjnnpapoeobnolbbkoibbcif. Make sure to export it as `cookies.txt` to the same folder that you will run the script.
+3. Add FFmpeg to PATH or specify the location using the command line arguments or the config file (see [Configuration](#configuration))
 
-## Usage
+## Usage examples
+Download a song:
 ```
-usage: gytmdl [-h] [-u [URLS_TXT]] [-t TEMP_PATH] [-f FINAL_PATH] [-c COOKIES_LOCATION] [-i {141,251,140}] [-o]
-                   [-s] [-e] [-v]
-                   [<url> ...]
-
-Download YouTube Music songs/albums/playlists with tags from YouTube Music
-
-positional arguments:
-  <url>                 YouTube Music song/album/playlist URL(s) (default: None)
-
-options:
-  -h, --help            show this help message and exit
-  -u [URLS_TXT], --urls-txt [URLS_TXT]
-                        Read URLs from a text file (default: None)
-  -t TEMP_PATH, --temp-path TEMP_PATH
-                        Temp path (default: temp)
-  -f FINAL_PATH, --final-path FINAL_PATH
-                        Final path (default: YouTube Music)
-  -c COOKIES_LOCATION, --cookies-location COOKIES_LOCATION
-                        Cookies location (default: cookies.txt)
-  -i {141,251,140}, --itag {141,251,140}
-                        itag (quality). Can be 141 (256kbps AAC, requires cookies), 251 (128kbps Opus) or 140 (128kbps
-                        AAC) (default: 140)
-  -o, --overwrite       Overwrite existing files (default: False)
-  -s, --skip-cleanup    Skip cleanup (default: False)
-  -e, --print-exceptions
-                        Print exceptions (default: False)
-  -v, --version         show program's version number and exit
+gytmdl "https://music.youtube.com/watch?v=3BFTio5296w"
 ```
+Download an album:
+```
+gytmdl "https://music.youtube.com/playlist?list=OLAK5uy_lvpL_Gr_aVEq-LaivwJaSK5EbFd4HeamM"
+```
+
+## Configuration
+gytmdl can be configured using the command line arguments or the config file. The config file is created automatically when you run gytmdl for the first time at `~/.gytmdl/config.json` on Linux and `%USERPROFILE%\.gytmdl\config.json` on Windows. Config file values can be overridden using command line arguments.
+| Command line argument | Config file key | Description | Default value |
+| --- | --- | --- | --- |
+| `-f`, `--final-path` | `final_path` | Path where the downloaded files will be saved. | `./YouTube Music` |
+| `-t`, `--temp-path` | `temp_path` | Path where the temporary files will be saved. | `./temp` |
+| `-c`, `--cookies-location` | `cookies_location` | Location of the cookies file. By setting a cookies file, you can download age restricted tracks, private playlists and songs in 256kbps AAC if you are a premium user. You can export your cookies by using the following Google Chrome extension on YouTube Music website: https://chrome.google.com/webstore/detail/gdocmgbfkjnnpapoeobnolbbkoibbcif. | `null` |
+| `--ffmpeg-location` | `ffmpeg_location` | Location of the FFmpeg binary. | `ffmpeg` |
+| `--config-location` | - | Location of the config file. | `<home>/.gytmdl/config.json`. |
+| `-i`, `--itag` | `itag` | Itag (audio quality). Can be `141` (256kbps AAC), `251` (128kbps Opus) or `140` (128kbps AAC). | `140` |
+| `--cover-size` | `cover_size` | Size of the cover. Can be any number between `0` and `16383`. `0` gets the highest resolution available. | `1200` |
+| `--cover-format` | `cover_format` | Format of the cover. Can be `jpg` or `png`. | `jpg` |
+| `--cover-quality` | `cover_quality` | JPEG quality of the cover. Can be any number between `0` and `100`. | `94` |
+| `--final-path-structure` | `final_path_structure` | Structure of the final path as a format string. Possible variables are `album`, `album_artist`, `artist`, `media_type`, `rating`, `title`, `track`, `track_total` and `year`. | `{album_artist}/{album}/{track:02d} {title}` |
+| `-e`, `--exclude-tags` | `exclude_tags` | List of tags to exclude from file tagging separated by commas. Possible variables are `album`, `album_artist`, `artist`, `comment`, `cover`, `lyrics`, `media_type`, `rating`, `title`, `track`, `track_total` and `year`. | `null` |
+| `--truncate` | `truncate` | Maximum length of the file/folder names. | `40` |
+| `-l`, `--log-level` | `log_level` | Log level. Can be `DEBUG`, `INFO`, `WARNING`, `ERROR` or `CRITICAL`. | `INFO` |
+| `-s`, `--save-cover` | `save_cover` | Save cover as a separate file. | `false` |
+| `-o`, `--overwrite` | `overwrite` | Overwrite existing files. | `false` |
+| `-p`. `--print-exceptions` | `print_exceptions` | Print exceptions. | `false` |
+| `-u`, `--url-txt` | - | Read URLs as location of text files containing URLs. | `false` |
+| `-n`, `--no-config-file` | - | Don't use the config file. | `false` |
