@@ -30,7 +30,7 @@ gytmdl can be configured using the command line arguments or the config file. Th
 | `-t`, `--temp-path` | `temp_path` | Path where the temporary files will be saved. | `./temp` |
 | `-c`, `--cookies-location` | `cookies_location` | Location of the cookies file. By setting a cookies file, you can download age restricted tracks, private playlists and songs in 256kbps AAC if you are a premium user. You can export your cookies by using the following Google Chrome extension on YouTube Music website: https://chrome.google.com/webstore/detail/gdocmgbfkjnnpapoeobnolbbkoibbcif. | `null` |
 | `--ffmpeg-location` | `ffmpeg_location` | Location of the FFmpeg binary. | `ffmpeg` |
-| `--config-location` | - | Location of the config file. | `<home>/.gytmdl/config.json`. |
+| `--config-location` | - | Location of the config file. | `<home>/.gytmdl/config.json` |
 | `-i`, `--itag` | `itag` | Itag (audio quality). Can be `141` (256kbps AAC), `251` (128kbps Opus) or `140` (128kbps AAC). | `140` |
 | `--cover-size` | `cover_size` | Size of the cover. Can be any number between `0` and `16383`. `0` gets the highest resolution available. | `1200` |
 | `--cover-format` | `cover_format` | Format of the cover. Can be `jpg` or `png`. | `jpg` |
