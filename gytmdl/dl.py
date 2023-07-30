@@ -1,3 +1,4 @@
+import datetime
 import functools
 import re
 import shutil
@@ -18,7 +19,7 @@ MP4_TAGS_MAP = {
     "media_type": "stik",
     "rating": "rtng",
     "title": "\xa9nam",
-    "year": "\xa9day",
+    "release_date": "\xa9day",
 }
 
 
@@ -147,6 +148,10 @@ class Dl:
             if lyrics is not None:
                 tags["lyrics"] = lyrics
         if ytmusic_album.get("year"):
+            tags["release_date"] = (
+                datetime.datetime.strptime(ytmusic_album["year"], "%Y").isoformat()
+                + "Z"
+            )
             tags["year"] = ytmusic_album["year"]
         return tags
 
