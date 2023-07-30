@@ -37,7 +37,6 @@ class Dl:
         final_path_structure: str,
         exclude_tags: str,
         truncate: int,
-        overwrite: bool,
         **kwargs,
     ):
         self.ytmusic = YTMusic()
@@ -56,7 +55,6 @@ class Dl:
             else []
         )
         self.truncate = None if truncate < 4 else truncate
-        self.overwrite = overwrite
 
     @functools.lru_cache()
     def get_ydl_extract_info(self, url):
@@ -189,7 +187,6 @@ class Dl:
         ydl_opts = {
             "quiet": True,
             "no_warnings": True,
-            "overwrites": self.overwrite,
             "fixup": "never",
             "format": self.itag,
             "outtmpl": str(temp_location),
