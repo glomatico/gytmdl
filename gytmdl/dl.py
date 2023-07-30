@@ -121,10 +121,8 @@ class Dl:
             "album_artist": self.get_artist(ytmusic_album["artists"]),
             "artist": self.get_artist(ytmusic_watch_playlist["tracks"][0]["artists"]),
             "comment": f"https://music.youtube.com/watch?v={video_id}",
-            "cover": self.get_cover(
-                f'{ytmusic_watch_playlist["tracks"][0]["thumbnail"][0]["url"].split("=")[0]}'
-                + f'=w{self.cover_size}-l{self.cover_quality}-{"rj" if self.cover_format == "jpg" else "rp"}'
-            ),
+            "cover_url": f'{ytmusic_watch_playlist["tracks"][0]["thumbnail"][0]["url"].split("=")[0]}'
+            + f'=w{self.cover_size}-l{self.cover_quality}-{"rj" if self.cover_format == "jpg" else "rp"}',
             "media_type": 1,
             "title": ytmusic_watch_playlist["tracks"][0]["title"],
             "track_total": ytmusic_album["trackCount"],
@@ -234,7 +232,7 @@ class Dl:
         if "cover" not in self.exclude_tags:
             _tags["covr"] = [
                 MP4Cover(
-                    self.get_cover(tags["cover"]), imageformat=MP4Cover.FORMAT_JPEG
+                    self.get_cover(tags["cover_url"]), imageformat=MP4Cover.FORMAT_JPEG
                 )
             ]
         if "track" not in self.exclude_tags:
@@ -252,7 +250,7 @@ class Dl:
 
     def save_cover(self, tags, cover_location):
         with open(cover_location, "wb") as f:
-            f.write(tags["cover"])
+            f.write(self.get_cover(tags["cover_url"]))
 
     def cleanup(self):
         shutil.rmtree(self.temp_path)
