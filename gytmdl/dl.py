@@ -168,11 +168,12 @@ class Dl:
 
     def get_final_location(self, tags):
         final_location = self.final_path_structure.split("/")
-        final_location[-1] = (
+        final_location = [
+            self.get_sanizated_string(i.format(**tags), True)
+            for i in final_location[:-1]
+        ] + [
             self.get_sanizated_string(final_location[-1].format(**tags), False) + ".m4a"
-        )
-        for i, path in enumerate(final_location[:-1]):
-            final_location[i] = self.get_sanizated_string(path.format(**tags), True)
+        ]
         return self.final_path.joinpath(*final_location)
 
     def get_cover_location(self, final_location):
