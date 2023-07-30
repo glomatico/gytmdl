@@ -18,8 +18,8 @@ MP4_TAGS_MAP = {
     "lyrics": "\xa9lyr",
     "media_type": "stik",
     "rating": "rtng",
-    "title": "\xa9nam",
     "release_date": "\xa9day",
+    "title": "\xa9nam",
 }
 
 
