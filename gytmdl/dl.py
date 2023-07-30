@@ -86,9 +86,10 @@ class Dl:
     def get_artist(self, artist_list):
         if len(artist_list) == 1:
             return artist_list[0]["name"]
-        artist = ", ".join([i["name"] for i in artist_list][:-1])
-        artist += f' & {artist_list[-1]["name"]}'
-        return artist
+        return (
+            ", ".join([i["name"] for i in artist_list][:-1])
+            + f' & {artist_list[-1]["name"]}'
+        )
 
     def get_ytmusic_watch_playlist(self, video_id):
         ytmusic_watch_playlist = self.ytmusic.get_watch_playlist(video_id)
