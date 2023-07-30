@@ -36,7 +36,7 @@ gytmdl can be configured using the command line arguments or the config file. Th
 | `--cover-format` | `cover_format` | Format of the cover. Can be `jpg` or `png`. | `jpg` |
 | `--cover-quality` | `cover_quality` | JPEG quality of the cover. Can be any number between `0` and `100`. | `94` |
 | `--final-path-structure` | `final_path_structure` | Structure of the final path as a format string. Possible variables are `album`, `album_artist`, `artist`, `media_type`, `rating`, `title`, `track`, `track_total` and `year`. | `{album_artist}/{album}/{track:02d} {title}` |
-| `-e`, `--exclude-tags` | `exclude_tags` | List of tags to exclude from file tagging separated by commas. Possible variables are `album`, `album_artist`, `artist`, `comment`, `cover`, `lyrics`, `media_type`, `rating`, `title`, `track`, `track_total` and `year`. | `null` |
+| `-e`, `--exclude-tags` | `exclude_tags` | List of tags to exclude from file tagging separated by commas. Possible variables are `album`, `album_artist`, `artist`, `comment`, `cover`, `lyrics`, `media_type`, `rating`, `release_date`, `title`, `track` and `track_total`. | `null` |
 | `--truncate` | `truncate` | Maximum length of the file/folder names. | `40` |
 | `-l`, `--log-level` | `log_level` | Log level. Can be `DEBUG`, `INFO`, `WARNING`, `ERROR` or `CRITICAL`. | `INFO` |
 | `-s`, `--save-cover` | `save_cover` | Save cover as a separate file. | `false` |
