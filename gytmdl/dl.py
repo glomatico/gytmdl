@@ -133,11 +133,15 @@ class Dl:
             )["entries"]
         ):
             if video["id"] == video_id:
-                if ytmusic_album["tracks"][i]["isExplicit"]:
-                    tags["rating"] = 1
-                else:
+                try:
+                    if ytmusic_album["tracks"][i]["isExplicit"]:
+                        tags["rating"] = 1
+                    else:
+                        tags["rating"] = 0
+                except IndexError:
                     tags["rating"] = 0
-                tags["track"] = i + 1
+                finally:
+                    tags["track"] = i + 1
                 break
         if ytmusic_watch_playlist["lyrics"]:
             lyrics = self.ytmusic.get_lyrics(ytmusic_watch_playlist["lyrics"])["lyrics"]
