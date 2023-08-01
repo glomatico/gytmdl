@@ -230,7 +230,7 @@ def cli(
                 f'Downloading "{track["title"]}" (track {j + 1}/{len(url)} from URL {i + 1}/{len(download_queue)})'
             )
             try:
-                logger.debug("Gettings tags")
+                logger.debug("Getting tags")
                 ytmusic_watch_playlist = dl.get_ytmusic_watch_playlist(track["id"])
                 if ytmusic_watch_playlist is None:
                     logger.warning("Track is a video, using song equivalent")
@@ -261,7 +261,8 @@ def cli(
             except Exception:
                 error_count += 1
                 logger.error(
-                    f'Failed to download "{track["title"]}" (track {j + 1}/{len(url)} from URL {i + 1}/{len(download_queue)})',
+                    f'Failed to download "{track["title"]}" (track {j + 1}/{len(url)} from URL '
+                    + f"{i + 1}/{len(download_queue)})",
                     exc_info=print_exceptions,
                 )
             finally:
