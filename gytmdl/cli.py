@@ -2,6 +2,8 @@ import json
 import logging
 import shutil
 from pathlib import Path
+import threading
+from concurrent.futures import ThreadPoolExecutor
 
 import click
 
@@ -114,6 +116,12 @@ def no_config_callback(
     help="JPEG quality of the cover.",
 )
 @click.option(
+    "--num-threads",
+    type=click.IntRange(1, 10),
+    default=1,
+    help="Number of threads to download in parallel.",
+)
+@click.option(
     "--final-path-structure",
     type=str,
     default="{album_artist}/{album}/{track:02d} {title}",
@@ -183,6 +191,7 @@ def cli(
     cover_size: int,
     cover_format: str,
     cover_quality: int,
+    num_threads: int,
     final_path_structure: str,
     exclude_tags: str,
     truncate: int,
@@ -224,48 +233,77 @@ def cli(
                 f"Failed to check URL {i + 1}/{len(urls)}", exc_info=print_exceptions
             )
     error_count = 0
-    for i, url in enumerate(download_queue):
-        for j, track in enumerate(url):
+
+    # Worker for downloading tracks, inner function
+    def process_track(track, j, i, tracks_count):
+        try:
             logger.info(
-                f'Downloading "{track["title"]}" (track {j + 1}/{len(url)} from URL {i + 1}/{len(download_queue)})'
+                f'Downloading "{track["title"]}" (track {j + 1}/{len(url_tracks)} from URL {i + 1}/{len(download_queue)})'
             )
-            try:
-                logger.debug("Gettings tags")
+            logger.debug("Gettings tags")
+            ytmusic_watch_playlist = dl.get_ytmusic_watch_playlist(track["id"])
+            if ytmusic_watch_playlist is None:
+                logger.warning("Track is a video, using song equivalent")
+                track["id"] = dl.search_track(track["title"])
+                logger.debug(f'Video ID changed to "{track["id"]}"')
                 ytmusic_watch_playlist = dl.get_ytmusic_watch_playlist(track["id"])
-                if ytmusic_watch_playlist is None:
-                    logger.warning("Track is a video, using song equivalent")
-                    track["id"] = dl.search_track(track["title"])
-                    logger.debug(f'Video ID changed to "{track["id"]}"')
-                    ytmusic_watch_playlist = dl.get_ytmusic_watch_playlist(track["id"])
-                tags = dl.get_tags(ytmusic_watch_playlist)
-                final_location = dl.get_final_location(tags)
-                if final_location.exists() and not overwrite:
-                    logger.warning(
-                        f'File already exists at "{final_location}", skipping'
-                    )
-                    continue
-                temp_location = dl.get_temp_location(track["id"])
-                logger.debug(f'Downloading to "{temp_location}"')
-                dl.download(track["id"], temp_location)
-                fixed_location = dl.get_fixed_location(track["id"])
-                logger.debug(f'Remuxing to "{fixed_location}"')
-                dl.fixup(temp_location, fixed_location)
-                logger.debug("Applying tags")
-                dl.apply_tags(fixed_location, tags)
-                logger.debug(f'Moving to "{final_location}"')
-                dl.move_to_final_location(fixed_location, final_location)
-                cover_location = dl.get_cover_location(final_location)
-                if save_cover and not cover_location.exists():
-                    logger.debug(f'Saving cover to "{cover_location}"')
-                    dl.save_cover(tags, cover_location)
-            except Exception:
-                error_count += 1
-                logger.error(
-                    f'Failed to download "{track["title"]}" (track {j + 1}/{len(url)} from URL {i + 1}/{len(download_queue)})',
-                    exc_info=print_exceptions,
+            tags = dl.get_tags(ytmusic_watch_playlist)
+            final_location = dl.get_final_location(tags)
+            if final_location.exists() and not overwrite:
+                logger.warning(
+                    f'File already exists at "{final_location}", skipping'
                 )
-            finally:
-                if temp_path.exists():
-                    logger.debug(f'Cleaning up "{temp_path}"')
-                    dl.cleanup()
+                return
+            temp_location = dl.get_temp_location(track["id"])
+            logger.debug(f'Downloading to "{temp_location}"')
+            dl.download(track["id"], temp_location)
+            fixed_location = dl.get_fixed_location(track["id"])
+            logger.debug(f'Remuxing to "{fixed_location}"')
+            dl.fixup(temp_location, fixed_location)
+            logger.debug("Applying tags")
+            dl.apply_tags(fixed_location, tags)
+            logger.debug(f'Moving to "{final_location}"')
+            dl.move_to_final_location(fixed_location, final_location)
+            cover_location = dl.get_cover_location(final_location)
+            if save_cover and not cover_location.exists():
+                logger.debug(f'Saving cover to "{cover_location}"')
+                dl.save_cover(tags, cover_location)
+        except Exception:
+            nonlocal error_count
+            error_count += 1
+            logger.error(
+                f'Failed to download "{track["title"]}" (track {j + 1}/{len(url)} from URL {i + 1}/{len(download_queue)})',
+                exc_info=print_exceptions,
+            )
+    
+    
+    # Initialize an empty set to keep track of processed tracks
+    processed_tracks = set()
+
+    # Create a lock to synchronize access to shared resources
+    lock = threading.Lock()
+
+    # Define a function to submit a track for processing with synchronization
+    def submit_track(track, j, i, tracks_count):
+    # Acquire the lock to ensure only one thread modifies shared data at a time
+        with lock:
+            # Check if the track has already been processed
+            if track["id"] not in processed_tracks:
+                # Mark the track as processed
+                processed_tracks.add(track["id"])
+                # Submit the track for processing using the executor (thread pool)
+                executor.submit(process_track, track, j, i, tracks_count)
+
+    # Create a thread pool with the specified number of threads
+    with ThreadPoolExecutor(max_workers=num_threads) as executor:
+        for i, url_tracks in enumerate(download_queue):
+            for j, track in enumerate(url_tracks):
+                # Submit the track for processing, along with relevant indexes and counts
+                submit_track(track, j, i, len(url_tracks))
+    
+    if temp_path.exists():
+        logger.debug(f'Cleaning up "{temp_path}"')
+        dl.cleanup()
+
     logger.info(f"Done ({error_count} error(s))")
+
