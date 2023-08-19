@@ -114,10 +114,16 @@ def no_config_callback(
     help="JPEG quality of the cover.",
 )
 @click.option(
-    "--final-path-structure",
+    "--template-folder",
     type=str,
-    default="{album_artist}/{album}/{track:02d} {title}",
-    help="Final path structure as a format string.",
+    default="{album_artist}/{album}",
+    help="Template of the album folders as a format string.",
+)
+@click.option(
+    "--template-file",
+    type=str,
+    default="{track:02d} {title}",
+    help="Template of the song files as a format string.",
 )
 @click.option(
     "--exclude-tags",
@@ -183,7 +189,8 @@ def cli(
     cover_size: int,
     cover_format: str,
     cover_quality: int,
-    final_path_structure: str,
+    template_folder: str,
+    template_file: str,
     exclude_tags: str,
     truncate: int,
     log_level: str,

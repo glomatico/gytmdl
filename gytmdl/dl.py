@@ -34,7 +34,8 @@ class Dl:
         cover_size: int = None,
         cover_format: str = None,
         cover_quality: int = None,
-        final_path_structure: str = None,
+        template_folder: str = None,
+        template_file: str = None,
         exclude_tags: str = None,
         truncate: int = None,
         **kwargs,
@@ -48,7 +49,8 @@ class Dl:
         self.cover_size = cover_size
         self.cover_format = cover_format
         self.cover_quality = cover_quality
-        self.final_path_structure = final_path_structure
+        self.template_folder = template_folder
+        self.template_file = template_file
         self.exclude_tags = (
             [i.lower() for i in exclude_tags.split(",")]
             if exclude_tags is not None
@@ -173,14 +175,22 @@ class Dl:
         return self.temp_path / f"{video_id}_fixed.m4a"
 
     def get_final_location(self, tags):
-        final_location = self.final_path_structure.split("/")
-        final_location = [
+        final_location_folder = self.template_folder.split("/")
+        final_location_file = self.template_file.split("/")
+        final_location_folder = [
             self.get_sanizated_string(i.format(**tags), True)
-            for i in final_location[:-1]
-        ] + [
-            self.get_sanizated_string(final_location[-1].format(**tags), False) + ".m4a"
+            for i in final_location_folder
         ]
-        return self.final_path.joinpath(*final_location)
+        final_location_file = [
+            self.get_sanizated_string(i.format(**tags), True)
+            for i in final_location_file[:-1]
+        ] + [
+            self.get_sanizated_string(final_location_file[-1].format(**tags), False)
+            + ".m4a"
+        ]
+        return self.final_path.joinpath(*final_location_folder).joinpath(
+            *final_location_file
+        )
 
     def get_cover_location(self, final_location):
         return final_location.parent / f"Cover.{self.cover_format}"
