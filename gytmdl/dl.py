@@ -26,17 +26,17 @@ MP4_TAGS_MAP = {
 class Dl:
     def __init__(
         self,
-        final_path: Path,
-        temp_path: Path,
-        cookies_location: Path,
-        ffmpeg_location: str,
-        itag: str,
-        cover_size: int,
-        cover_format: str,
-        cover_quality: int,
-        final_path_structure: str,
-        exclude_tags: str,
-        truncate: int,
+        final_path: Path = None,
+        temp_path: Path = None,
+        cookies_location: Path = None,
+        ffmpeg_location: str = None,
+        itag: str = None,
+        cover_size: int = None,
+        cover_format: str = None,
+        cover_quality: int = None,
+        final_path_structure: str = None,
+        exclude_tags: str = None,
+        truncate: int = None,
         **kwargs,
     ):
         self.ytmusic = YTMusic()
