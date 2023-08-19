@@ -246,7 +246,10 @@ class Dl:
         if "cover" not in self.exclude_tags:
             mp4_tags["covr"] = [
                 MP4Cover(
-                    self.get_cover(tags["cover_url"]), imageformat=MP4Cover.FORMAT_JPEG
+                    self.get_cover(tags["cover_url"]),
+                    imageformat=MP4Cover.FORMAT_JPEG
+                    if self.cover_format == "jpg"
+                    else MP4Cover.FORMAT_PNG,
                 )
             ]
         if "track" not in self.exclude_tags:
