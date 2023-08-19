@@ -154,7 +154,7 @@ class Dl:
                 datetime.datetime.strptime(ytmusic_album["year"], "%Y").isoformat()
                 + "Z"
             )
-            tags["year"] = ytmusic_album["year"]
+            tags["release_year"] = ytmusic_album["year"]
         return tags
 
     def get_sanizated_string(self, dirty_string, is_folder):
