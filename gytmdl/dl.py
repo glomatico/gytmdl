@@ -54,7 +54,7 @@ class Dl:
             if exclude_tags is not None
             else []
         )
-        self.truncate = None if truncate < 4 else truncate
+        self.truncate = None if truncate is not None and truncate < 4 else truncate
 
     @functools.lru_cache()
     def get_ydl_extract_info(self, url):
