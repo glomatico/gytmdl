@@ -262,9 +262,14 @@ def cli(
                 logger.debug(f'Moving to "{final_location}"')
                 dl.move_to_final_location(fixed_location, final_location)
                 cover_location = dl.get_cover_location(final_location)
-                if save_cover and not cover_location.exists():
-                    logger.debug(f'Saving cover to "{cover_location}"')
-                    dl.save_cover(tags, cover_location)
+                if save_cover:
+                    if not cover_location.exists():
+                        logger.debug(f'Saving cover to "{cover_location}"')
+                        dl.save_cover(tags, cover_location)
+                    else:
+                        logger.debug(
+                            f'File already exists at "{cover_location}", skipping'
+                        )
             except Exception:
                 error_count += 1
                 logger.error(
