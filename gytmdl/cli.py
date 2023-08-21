@@ -246,24 +246,24 @@ def cli(
                     ytmusic_watch_playlist = dl.get_ytmusic_watch_playlist(track["id"])
                 tags = dl.get_tags(ytmusic_watch_playlist)
                 final_location = dl.get_final_location(tags)
-                if final_location.exists() and not overwrite:
+                if not final_location.exists() or overwrite:
+                    temp_location = dl.get_temp_location(track["id"])
+                    logger.debug(f'Downloading to "{temp_location}"')
+                    dl.download(track["id"], temp_location)
+                    fixed_location = dl.get_fixed_location(track["id"])
+                    logger.debug(f'Remuxing to "{fixed_location}"')
+                    dl.fixup(temp_location, fixed_location)
+                    logger.debug("Applying tags")
+                    dl.apply_tags(fixed_location, tags)
+                    logger.debug(f'Moving to "{final_location}"')
+                    dl.move_to_final_location(fixed_location, final_location)
+                else:
                     logger.warning(
                         f'File already exists at "{final_location}", skipping'
                     )
-                    continue
-                temp_location = dl.get_temp_location(track["id"])
-                logger.debug(f'Downloading to "{temp_location}"')
-                dl.download(track["id"], temp_location)
-                fixed_location = dl.get_fixed_location(track["id"])
-                logger.debug(f'Remuxing to "{fixed_location}"')
-                dl.fixup(temp_location, fixed_location)
-                logger.debug("Applying tags")
-                dl.apply_tags(fixed_location, tags)
-                logger.debug(f'Moving to "{final_location}"')
-                dl.move_to_final_location(fixed_location, final_location)
-                cover_location = dl.get_cover_location(final_location)
                 if save_cover:
-                    if not cover_location.exists():
+                    cover_location = dl.get_cover_location(final_location)
+                    if not cover_location.exists() or overwrite:
                         logger.debug(f'Saving cover to "{cover_location}"')
                         dl.save_cover(tags, cover_location)
                     else:
