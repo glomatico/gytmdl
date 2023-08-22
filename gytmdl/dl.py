@@ -26,17 +26,18 @@ MP4_TAGS_MAP = {
 class Dl:
     def __init__(
         self,
-        final_path: Path,
-        temp_path: Path,
-        cookies_location: Path,
-        ffmpeg_location: str,
-        itag: str,
-        cover_size: int,
-        cover_format: str,
-        cover_quality: int,
-        final_path_structure: str,
-        exclude_tags: str,
-        truncate: int,
+        final_path: Path = None,
+        temp_path: Path = None,
+        cookies_location: Path = None,
+        ffmpeg_location: str = None,
+        itag: str = None,
+        cover_size: int = None,
+        cover_format: str = None,
+        cover_quality: int = None,
+        template_folder: str = None,
+        template_file: str = None,
+        exclude_tags: str = None,
+        truncate: int = None,
         **kwargs,
     ):
         self.ytmusic = YTMusic()
@@ -48,13 +49,14 @@ class Dl:
         self.cover_size = cover_size
         self.cover_format = cover_format
         self.cover_quality = cover_quality
-        self.final_path_structure = final_path_structure
+        self.template_folder = template_folder
+        self.template_file = template_file
         self.exclude_tags = (
             [i.lower() for i in exclude_tags.split(",")]
             if exclude_tags is not None
             else []
         )
-        self.truncate = None if truncate < 4 else truncate
+        self.truncate = None if truncate is not None and truncate < 4 else truncate
 
     @functools.lru_cache()
     def get_ydl_extract_info(self, url):
@@ -152,7 +154,7 @@ class Dl:
                 datetime.datetime.strptime(ytmusic_album["year"], "%Y").isoformat()
                 + "Z"
             )
-            tags["year"] = ytmusic_album["year"]
+            tags["release_year"] = ytmusic_album["year"]
         return tags
 
     def get_sanizated_string(self, dirty_string, is_folder):
@@ -173,14 +175,22 @@ class Dl:
         return self.temp_path / f"{video_id}_fixed.m4a"
 
     def get_final_location(self, tags):
-        final_location = self.final_path_structure.split("/")
-        final_location = [
+        final_location_folder = self.template_folder.split("/")
+        final_location_file = self.template_file.split("/")
+        final_location_folder = [
             self.get_sanizated_string(i.format(**tags), True)
-            for i in final_location[:-1]
-        ] + [
-            self.get_sanizated_string(final_location[-1].format(**tags), False) + ".m4a"
+            for i in final_location_folder
         ]
-        return self.final_path.joinpath(*final_location)
+        final_location_file = [
+            self.get_sanizated_string(i.format(**tags), True)
+            for i in final_location_file[:-1]
+        ] + [
+            self.get_sanizated_string(final_location_file[-1].format(**tags), False)
+            + ".m4a"
+        ]
+        return self.final_path.joinpath(*final_location_folder).joinpath(
+            *final_location_file
+        )
 
     def get_cover_location(self, final_location):
         return final_location.parent / f"Cover.{self.cover_format}"
@@ -226,26 +236,29 @@ class Dl:
         )
 
     def apply_tags(self, fixed_location, tags):
-        _tags = {
+        mp4_tags = {
             v: [tags[k]]
             for k, v in MP4_TAGS_MAP.items()
             if k not in self.exclude_tags and tags.get(k) is not None
         }
         if not {"track", "track_total"} & set(self.exclude_tags):
-            _tags["trkn"] = [[0, 0]]
+            mp4_tags["trkn"] = [[0, 0]]
         if "cover" not in self.exclude_tags:
-            _tags["covr"] = [
+            mp4_tags["covr"] = [
                 MP4Cover(
-                    self.get_cover(tags["cover_url"]), imageformat=MP4Cover.FORMAT_JPEG
+                    self.get_cover(tags["cover_url"]),
+                    imageformat=MP4Cover.FORMAT_JPEG
+                    if self.cover_format == "jpg"
+                    else MP4Cover.FORMAT_PNG,
                 )
             ]
         if "track" not in self.exclude_tags:
-            _tags["trkn"][0][0] = tags["track"]
+            mp4_tags["trkn"][0][0] = tags["track"]
         if "track_total" not in self.exclude_tags:
-            _tags["trkn"][0][1] = tags["track_total"]
+            mp4_tags["trkn"][0][1] = tags["track_total"]
         mp4 = MP4(fixed_location)
         mp4.clear()
-        mp4.update(_tags)
+        mp4.update(mp4_tags)
         mp4.save()
 
     def move_to_final_location(self, fixed_location, final_location):

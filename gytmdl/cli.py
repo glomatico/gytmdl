@@ -114,17 +114,23 @@ def no_config_callback(
     help="JPEG quality of the cover.",
 )
 @click.option(
-    "--final-path-structure",
+    "--template-folder",
     type=str,
-    default="{album_artist}/{album}/{track:02d} {title}",
-    help="Final path structure as a format string.",
+    default="{album_artist}/{album}",
+    help="Template of the album folders as a format string.",
+)
+@click.option(
+    "--template-file",
+    type=str,
+    default="{track:02d} {title}",
+    help="Template of the song files as a format string.",
 )
 @click.option(
     "--exclude-tags",
     "-e",
     type=str,
     default=None,
-    help="List of tags to exclude from file tagging separated by commas.",
+    help="List of tags to exclude from file tagging separated by commas without spaces.",
 )
 @click.option(
     "--truncate",
@@ -183,7 +189,8 @@ def cli(
     cover_size: int,
     cover_format: str,
     cover_quality: int,
-    final_path_structure: str,
+    template_folder: str,
+    template_file: str,
     exclude_tags: str,
     truncate: int,
     log_level: str,
@@ -230,7 +237,7 @@ def cli(
                 f'Downloading "{track["title"]}" (track {j + 1}/{len(url)} from URL {i + 1}/{len(download_queue)})'
             )
             try:
-                logger.debug("Gettings tags")
+                logger.debug("Getting tags")
                 ytmusic_watch_playlist = dl.get_ytmusic_watch_playlist(track["id"])
                 if ytmusic_watch_playlist is None:
                     logger.warning("Track is a video, using song equivalent")
@@ -239,29 +246,34 @@ def cli(
                     ytmusic_watch_playlist = dl.get_ytmusic_watch_playlist(track["id"])
                 tags = dl.get_tags(ytmusic_watch_playlist)
                 final_location = dl.get_final_location(tags)
-                if final_location.exists() and not overwrite:
-                    logger.warning(
-                        f'File already exists at "{final_location}", skipping'
-                    )
-                    continue
-                temp_location = dl.get_temp_location(track["id"])
-                logger.debug(f'Downloading to "{temp_location}"')
-                dl.download(track["id"], temp_location)
-                fixed_location = dl.get_fixed_location(track["id"])
-                logger.debug(f'Remuxing to "{fixed_location}"')
-                dl.fixup(temp_location, fixed_location)
-                logger.debug("Applying tags")
-                dl.apply_tags(fixed_location, tags)
-                logger.debug(f'Moving to "{final_location}"')
-                dl.move_to_final_location(fixed_location, final_location)
-                cover_location = dl.get_cover_location(final_location)
-                if save_cover and not cover_location.exists():
-                    logger.debug(f'Saving cover to "{cover_location}"')
-                    dl.save_cover(tags, cover_location)
+                logger.debug(f'Final location is "{final_location}"')
+                if not final_location.exists() or overwrite:
+                    temp_location = dl.get_temp_location(track["id"])
+                    logger.debug(f'Downloading to "{temp_location}"')
+                    dl.download(track["id"], temp_location)
+                    fixed_location = dl.get_fixed_location(track["id"])
+                    logger.debug(f'Remuxing to "{fixed_location}"')
+                    dl.fixup(temp_location, fixed_location)
+                    logger.debug("Applying tags")
+                    dl.apply_tags(fixed_location, tags)
+                    logger.debug("Moving to final location")
+                    dl.move_to_final_location(fixed_location, final_location)
+                else:
+                    logger.warning("File already exists at final location, skipping")
+                if save_cover:
+                    cover_location = dl.get_cover_location(final_location)
+                    if not cover_location.exists() or overwrite:
+                        logger.debug(f'Saving cover to "{cover_location}"')
+                        dl.save_cover(tags, cover_location)
+                    else:
+                        logger.debug(
+                            f'File already exists at "{cover_location}", skipping'
+                        )
             except Exception:
                 error_count += 1
                 logger.error(
-                    f'Failed to download "{track["title"]}" (track {j + 1}/{len(url)} from URL {i + 1}/{len(download_queue)})',
+                    f'Failed to download "{track["title"]}" (track {j + 1}/{len(url)} from URL '
+                    + f"{i + 1}/{len(download_queue)})",
                     exc_info=print_exceptions,
                 )
             finally:
