@@ -130,7 +130,7 @@ def no_config_callback(
     "-e",
     type=str,
     default=None,
-    help="List of tags to exclude from file tagging separated by commas.",
+    help="List of tags to exclude from file tagging separated by commas without spaces.",
 )
 @click.option(
     "--truncate",
