@@ -50,6 +50,15 @@ gytmdl can be configured using the command line arguments or the config file. Th
 | `--version` / - | Show the version and exit. | `false` |
 | `-h`, `--help` / - | Show this message and exit. | `false` |
 
+### Itags
+The following itags are available:
+- `141` (256kbps AAC)
+- `140` (128kbps AAC)
+- `251` (128kbps Opus)
+
+### Cover formats
+Can be either `jpg` or `png`.
+
 ### Tag variables
 The following variables can be used in the template folder/file and/or in the `exclude_tags` list:
 - `album`
@@ -65,12 +74,3 @@ The following variables can be used in the template folder/file and/or in the `e
 - `title`
 - `track`
 - `track_total`
-
-### Itags
-The following itags are available:
-- `141` (256kbps AAC)
-- `140` (128kbps AAC)
-- `251` (128kbps Opus)
-
-### Cover formats
-Can be either `jpg` or `png`.
