@@ -86,7 +86,7 @@ def no_config_callback(
     "--config-location",
     type=Path,
     default=Path.home() / ".gytmdl" / "config.json",
-    help="Config file location.",
+    help="Location of the config file.",
 )
 @click.option(
     "--itag",
