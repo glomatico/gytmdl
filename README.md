@@ -39,7 +39,7 @@ gytmdl can be configured using the command line arguments or the config file. Th
 | `--cover-quality` / `cover_quality` | JPEG quality of the cover.  [1<=x<=100] | `94` |
 | `--template-folder` / `template_folder` | Template of the album folders as a format string. | `{album_artist}/{album}` |
 | `--template-file` / `template_file` | Template of the song files as a format string. | `{track:02d} {title}` |
-| `-e`, `--exclude-tags` / `exclude_tags` | List of tags to exclude from file tagging separated by commas. | `null` |
+| `-e`, `--exclude-tags` / `exclude_tags` | List of tags to exclude from file tagging separated by commas without spaces. | `null` |
 | `--truncate` / `truncate` | Maximum length of the file/folder names. | `40` |
 | `-l`, `--log-level` / `log_level` | Log level. | `INFO` |
 | `-s`, `--save-cover` / `save_cover` | Save cover as a separate file. | `false` |
