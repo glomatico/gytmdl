@@ -246,6 +246,7 @@ def cli(
                     ytmusic_watch_playlist = dl.get_ytmusic_watch_playlist(track["id"])
                 tags = dl.get_tags(ytmusic_watch_playlist)
                 final_location = dl.get_final_location(tags)
+                logger.debug(f'Final location is "{final_location}"')
                 if not final_location.exists() or overwrite:
                     temp_location = dl.get_temp_location(track["id"])
                     logger.debug(f'Downloading to "{temp_location}"')
@@ -255,12 +256,10 @@ def cli(
                     dl.fixup(temp_location, fixed_location)
                     logger.debug("Applying tags")
                     dl.apply_tags(fixed_location, tags)
-                    logger.debug(f'Moving to "{final_location}"')
+                    logger.debug("Moving to final location")
                     dl.move_to_final_location(fixed_location, final_location)
                 else:
-                    logger.warning(
-                        f'File already exists at "{final_location}", skipping'
-                    )
+                    logger.warning("File already exists at final location, skipping")
                 if save_cover:
                     cover_location = dl.get_cover_location(final_location)
                     if not cover_location.exists() or overwrite:
