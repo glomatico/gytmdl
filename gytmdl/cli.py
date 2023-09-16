@@ -221,6 +221,7 @@ def cli(
         urls = tuple(_urls)
     logger.debug("Starting downloader")
     dl = Dl(**locals())
+    dl.setup_ytmusic()
     download_queue = []
     for i, url in enumerate(urls):
         try:

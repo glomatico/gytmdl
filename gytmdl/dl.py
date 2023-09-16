@@ -40,7 +40,6 @@ class Dl:
         truncate: int = None,
         **kwargs,
     ):
-        self.ytmusic = YTMusic()
         self.final_path = final_path
         self.temp_path = temp_path
         self.cookies_location = cookies_location
@@ -57,6 +56,9 @@ class Dl:
             else []
         )
         self.truncate = None if truncate is not None and truncate < 4 else truncate
+
+    def setup_ytmusic(self) -> None:
+        self.ytmusic = YTMusic()
 
     @functools.lru_cache()
     def get_ydl_extract_info(self, url):
