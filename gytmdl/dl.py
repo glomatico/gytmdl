@@ -6,7 +6,7 @@ import subprocess
 from pathlib import Path
 
 import requests
-from mutagen.mp4 import MP4, MP4Cover
+from mutagen.mp4 import MP4, MP4Cover, MP4FreeForm
 from yt_dlp import YoutubeDL
 from ytmusicapi import YTMusic
 
@@ -21,7 +21,7 @@ MP4_TAGS_MAP = {
     "release_date": "\xa9day",
     "title": "\xa9nam",
 }
-
+YTID_TAG_KEY = "----:com.github.gytmdl:ytid"
 
 class Dl:
     def __init__(
@@ -256,6 +256,7 @@ class Dl:
             mp4_tags["trkn"][0][0] = tags["track"]
         if "track_total" not in self.exclude_tags:
             mp4_tags["trkn"][0][1] = tags["track_total"]
+        mp4_tags[YTID_TAG_KEY] = MP4FreeForm(tags["ytid"].encode())
         mp4 = MP4(fixed_location)
         mp4.clear()
         mp4.update(mp4_tags)

@@ -4,9 +4,10 @@ import shutil
 from pathlib import Path
 
 import click
+from mutagen.mp4 import MP4
 
 from . import __version__
-from .dl import Dl
+from .dl import Dl, YTID_TAG_KEY
 
 EXCLUDED_PARAMS = (
     "urls",
@@ -219,6 +220,14 @@ def cli(
             with open(url, "r") as f:
                 _urls.extend(f.read().splitlines())
         urls = tuple(_urls)
+    already_downloaded_ids = []
+    for path in final_path.rglob("**/*.m4a"):
+        try:
+            mp4 = MP4(path)
+            if YTID_TAG_KEY in mp4:
+                already_downloaded_ids.append(mp4[YTID_TAG_KEY][0].decode())
+        except:
+            logger.debug(f'Failed to read tags from "{path}"')
     logger.debug("Starting downloader")
     dl = Dl(**locals())
     download_queue = []
@@ -233,25 +242,32 @@ def cli(
     error_count = 0
     for i, url in enumerate(download_queue):
         for j, track in enumerate(url):
+            track_id = track["id"]
+            if track_id in already_downloaded_ids:
+                logger.info(
+                    f'Skipping already downloaded track: {track["title"]}'
+                )
+                continue
             logger.info(
                 f'Downloading "{track["title"]}" (track {j + 1}/{len(url)} from URL {i + 1}/{len(download_queue)})'
             )
             try:
                 logger.debug("Getting tags")
-                ytmusic_watch_playlist = dl.get_ytmusic_watch_playlist(track["id"])
+                ytmusic_watch_playlist = dl.get_ytmusic_watch_playlist(track_id)
                 if ytmusic_watch_playlist is None:
                     logger.warning("Track is a video, using song equivalent")
-                    track["id"] = dl.search_track(track["title"])
-                    logger.debug(f'Video ID changed to "{track["id"]}"')
-                    ytmusic_watch_playlist = dl.get_ytmusic_watch_playlist(track["id"])
+                    track_id = dl.search_track(track["title"])
+                    logger.debug(f'Video ID changed to "{track_id}"')
+                    ytmusic_watch_playlist = dl.get_ytmusic_watch_playlist(track_id)
                 tags = dl.get_tags(ytmusic_watch_playlist)
+                tags["ytid"] = track["id"]
                 final_location = dl.get_final_location(tags)
                 logger.debug(f'Final location is "{final_location}"')
                 if not final_location.exists() or overwrite:
-                    temp_location = dl.get_temp_location(track["id"])
+                    temp_location = dl.get_temp_location(track_id)
                     logger.debug(f'Downloading to "{temp_location}"')
-                    dl.download(track["id"], temp_location)
-                    fixed_location = dl.get_fixed_location(track["id"])
+                    dl.download(track_id, temp_location)
+                    fixed_location = dl.get_fixed_location(track_id)
                     logger.debug(f'Remuxing to "{fixed_location}"')
                     dl.fixup(temp_location, fixed_location)
                     logger.debug("Applying tags")
