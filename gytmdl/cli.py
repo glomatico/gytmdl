@@ -242,7 +242,8 @@ def cli(
     error_count = 0
     for i, url in enumerate(download_queue):
         for j, track in enumerate(url):
-            if track["id"] in already_downloaded_ids:
+            track_id = track["id"]
+            if track_id in already_downloaded_ids:
                 logger.info(
                     f'Skipping already downloaded track: {track["title"]}'
                 )
@@ -252,21 +253,21 @@ def cli(
             )
             try:
                 logger.debug("Getting tags")
-                ytmusic_watch_playlist = dl.get_ytmusic_watch_playlist(track["id"])
+                ytmusic_watch_playlist = dl.get_ytmusic_watch_playlist(track_id)
                 if ytmusic_watch_playlist is None:
                     logger.warning("Track is a video, using song equivalent")
-                    track["id"] = dl.search_track(track["title"])
-                    logger.debug(f'Video ID changed to "{track["id"]}"')
-                    ytmusic_watch_playlist = dl.get_ytmusic_watch_playlist(track["id"])
+                    track_id = dl.search_track(track["title"])
+                    logger.debug(f'Video ID changed to "{track_id}"')
+                    ytmusic_watch_playlist = dl.get_ytmusic_watch_playlist(track_id)
                 tags = dl.get_tags(ytmusic_watch_playlist)
                 tags["ytid"] = track["id"]
                 final_location = dl.get_final_location(tags)
                 logger.debug(f'Final location is "{final_location}"')
                 if not final_location.exists() or overwrite:
-                    temp_location = dl.get_temp_location(track["id"])
+                    temp_location = dl.get_temp_location(track_id)
                     logger.debug(f'Downloading to "{temp_location}"')
-                    dl.download(track["id"], temp_location)
-                    fixed_location = dl.get_fixed_location(track["id"])
+                    dl.download(track_id, temp_location)
+                    fixed_location = dl.get_fixed_location(track_id)
                     logger.debug(f'Remuxing to "{fixed_location}"')
                     dl.fixup(temp_location, fixed_location)
                     logger.debug("Applying tags")
