@@ -245,6 +245,8 @@ def cli(
                     logger.debug(f'Video ID changed to "{track["id"]}"')
                     ytmusic_watch_playlist = dl.get_ytmusic_watch_playlist(track["id"])
                 tags = dl.get_tags(ytmusic_watch_playlist)
+                if not "track" in tags:
+                    tags["track"] = 1
                 final_location = dl.get_final_location(tags)
                 logger.debug(f'Final location is "{final_location}"')
                 if not final_location.exists() or overwrite:
