@@ -77,6 +77,12 @@ def no_config_callback(
     help="Location of the cookies file.",
 )
 @click.option(
+    "--cookies-from-browser",
+    type=str,
+    default=None,
+    help="Name of browser to load cookies from. See yt-dlp manual for details."
+)
+@click.option(
     "--ffmpeg-location",
     type=Path,
     default="ffmpeg",
@@ -183,6 +189,7 @@ def cli(
     final_path: Path,
     temp_path: Path,
     cookies_location: Path,
+    cookies_from_browser: str,
     ffmpeg_location: Path,
     config_location: Path,
     itag: str,
@@ -211,6 +218,9 @@ def cli(
         return
     if cookies_location is not None and not cookies_location.exists():
         logger.critical(f'Cookies file not found at "{cookies_location}"')
+        return
+    if cookies_location is not None and cookies_from_browser is not None:
+        logger.critical('Cannot use both --cookies-location and --cookies-from-browser')
         return
     if url_txt:
         logger.debug("Reading URLs from text files")

@@ -29,6 +29,7 @@ class Dl:
         final_path: Path = None,
         temp_path: Path = None,
         cookies_location: Path = None,
+        cookies_from_browser: str = None,
         ffmpeg_location: str = None,
         itag: str = None,
         cover_size: int = None,
@@ -57,6 +58,23 @@ class Dl:
             else []
         )
         self.truncate = None if truncate is not None and truncate < 4 else truncate
+        if cookies_from_browser:
+            # from yt-dlp 2024.3.10
+            mobj = re.fullmatch(r'''(?x)
+                (?P<name>[^+:]+)
+                (?:\s*\+\s*(?P<keyring>[^:]+))?
+                (?:\s*:\s*(?!:)(?P<profile>.+?))?
+                (?:\s*::\s*(?P<container>.+))?
+            ''', cookies_from_browser)
+            if mobj is None:
+                raise ValueError(f'Invalid cookies from browser arguments: {cookies_from_browser}')
+            browser_name, keyring, profile, container = mobj.group('name', 'keyring', 'profile', 'container')
+            browser_name = browser_name.lower()
+            if keyring is not None:
+                keyring = keyring.upper()
+            self.cookies_from_browser = (browser_name, profile, keyring, container)
+        else:
+            self.cookies_from_browser = None
 
     @functools.lru_cache()
     def get_ydl_extract_info(self, url):
@@ -67,6 +85,8 @@ class Dl:
         }
         if self.cookies_location is not None:
             ydl_opts["cookiefile"] = str(self.cookies_location)
+        elif self.cookies_from_browser is not None:
+            ydl_opts["cookiesfrombrowser"] = self.cookies_from_browser
         with YoutubeDL(ydl_opts) as ydl:
             return ydl.extract_info(url, download=False)
 
@@ -205,6 +225,8 @@ class Dl:
         }
         if self.cookies_location is not None:
             ydl_opts["cookiefile"] = str(self.cookies_location)
+        elif self.cookies_from_browser is not None:
+            ydl_opts["cookiesfrombrowser"] = self.cookies_from_browser
         with YoutubeDL(ydl_opts) as ydl:
             ydl.download("music.youtube.com/watch?v=" + video_id)
 

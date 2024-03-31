@@ -31,6 +31,7 @@ gytmdl can be configured using the command line arguments or the config file. Th
 | `-f`, `--final-path` / `final_path` | Path where the downloaded files will be saved. | `./YouTube Music` |
 | `-t`, `--temp-path` / `temp_path` | Path where the temporary files will be saved. | `./temp` |
 | `-c`, `--cookies-location` / `cookies_location` | Location of the cookies file. | `null` |
+| `--cookies-from-browser` / `cookies_from_browser` | Name of browser to load cookies from (passed to yt-dlp). | `null` |
 | `--ffmpeg-location` / `ffmpeg_location` | Location of the FFmpeg binary. | `ffmpeg` |
 | `--config-location` / - | Location of the config file. | `<home folder>/.gytmdl/config.json` |
 | `-i`, `--itag` / `itag` | Itag (audio quality). | `140` |
