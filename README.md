@@ -36,7 +36,7 @@ gytmdl [OPTIONS] URLS...
     ```bash
     gytmdl "https://music.youtube.com/playlist?list=OLAK5uy_lvpL_Gr_aVEq-LaivwJaSK5EbFd4HeamM"
     ```
-* Choose which albums or music videos to download from an artist:
+* Choose which albums or singles to download from an artist:
     ```bash
     gytmdl "https://music.youtube.com/channel/UCwZEU0wAwIyZb4x5G_KJp2w"
     ```
