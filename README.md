@@ -36,8 +36,18 @@ gytmdl [OPTIONS] URLS...
     ```bash
     gytmdl "https://music.youtube.com/playlist?list=OLAK5uy_lvpL_Gr_aVEq-LaivwJaSK5EbFd4HeamM"
     ```
+* Choose which albums or music videos to download from an artist:
+    ```bash
+    gytmdl "https://music.youtube.com/channel/UCwZEU0wAwIyZb4x5G_KJp2w"
+    ```
 
 **Songs that don't have an album are not supported**. To make sure you get valid links, enable filtering by albums or songs when searching on YouTube Music.
+
+### Interactive prompt controls
+* Enter - Confirm selection
+* Space - Toggle selection
+* Arrow keys - Move selection
+* Ctrl + A - Select all
 
 ## Configuration
 gytmdl can be configured by using the command line arguments or the config file. The config file is created automatically when you run gytmdl for the first time at `~/.gytmdl/config.json` on Linux and `%USERPROFILE%\.gytmdl\config.json` on Windows. Config file values can be overridden using command line arguments.
