@@ -15,4 +15,4 @@ requires = ["flit_core"]
 build-backend = "flit_core.buildapi"
 
 [project.scripts]
-gytmdl = "gytmdl.cli:cli"
+gytmdl = "gytmdl.cli:main"
