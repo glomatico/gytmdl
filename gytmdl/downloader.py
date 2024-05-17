@@ -9,8 +9,11 @@ import typing
 from pathlib import Path
 
 import requests
+from InquirerPy import inquirer
+from InquirerPy.base.control import Choice
 from mutagen.mp4 import MP4, MP4Cover
 from yt_dlp import YoutubeDL
+from yt_dlp.extractor.youtube import YoutubeTabIE
 from ytmusicapi import YTMusic
 
 from .constants import MP4_TAGS_MAP
@@ -92,7 +95,20 @@ class Downloader:
         ) as ydl:
             return ydl.extract_info(url, download=False)
 
-    def get_download_queue(self, url: str) -> typing.Generator[dict, None, None]:
+    def get_download_queue(
+        self,
+        url: str,
+    ) -> typing.Generator[dict, None, None]:
+        artist_match = re.match(YoutubeTabIE._VALID_URL, url)
+        if artist_match and artist_match.group("channel_type") == "channel":
+            yield from self._get_download_queue_artist(artist_match.group("id"))
+        else:
+            yield from self._get_download_queue_url(url)
+
+    def _get_download_queue_url(
+        self,
+        url: str,
+    ) -> typing.Generator[dict, None, None]:
         ytdlp_info = self._get_ytdlp_info(url.split("&")[0])
         if "MPREb_" in ytdlp_info["webpage_url_basename"]:
             ytdlp_info = self._get_ytdlp_info(ytdlp_info["url"])
@@ -101,6 +117,55 @@ class Downloader:
                 yield entry
         if "watch" in ytdlp_info["webpage_url_basename"]:
             yield ytdlp_info
+
+    def _get_download_queue_artist(
+        self,
+        channel_id: str,
+    ) -> typing.Generator[dict, None, None]:
+        artist = self.ytmusic.get_artist(channel_id)
+        media_type = inquirer.select(
+            message=f'Select which type to download for artist "{artist["name"]}":',
+            choices=[
+                Choice(
+                    name="Albums",
+                    value="albums",
+                ),
+                Choice(
+                    name="Singles",
+                    value="singles",
+                ),
+            ],
+            validate=lambda result: artist.get(result, {}).get("results"),
+            invalid_message="The artist doesn't have any items of this type",
+        ).execute()
+        artist_albums = (
+            self.ytmusic.get_artist_albums(
+                artist[media_type]["browseId"], artist[media_type]["params"]
+            )
+            if artist[media_type].get("browseId") and artist[media_type].get("params")
+            else artist[media_type]["results"]
+        )
+        choices = [
+            Choice(
+                name=" | ".join(
+                    [
+                        album.get("year", "Unknown"),
+                        album["title"],
+                    ]
+                ),
+                value=album,
+            )
+            for album in artist_albums
+        ]
+        selected = inquirer.select(
+            message="Select which items to download: (Year | Title)",
+            choices=choices,
+            multiselect=True,
+        ).execute()
+        for album in selected:
+            yield from self._get_download_queue_url(
+                "https://music.youtube.com/browse/" + album["browseId"]
+            )
 
     @staticmethod
     def _get_artist(artist_list: dict) -> str:
