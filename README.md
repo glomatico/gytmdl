@@ -28,14 +28,16 @@ gytmdl [OPTIONS] URLS...
 ```
 
 ### Examples
-Download a song:
-```
-gytmdl "https://music.youtube.com/watch?v=3BFTio5296w"
-```
-Download an album:
-```
-gytmdl "https://music.youtube.com/playlist?list=OLAK5uy_lvpL_Gr_aVEq-LaivwJaSK5EbFd4HeamM"
-```
+* Download a song:
+    ```
+    gytmdl "https://music.youtube.com/watch?v=3BFTio5296w"
+    ```
+
+* Download an album:
+    ```
+    gytmdl "https://music.youtube.com/playlist?list=OLAK5uy_lvpL_Gr_aVEq-LaivwJaSK5EbFd4HeamM"
+    ```
+
 **Songs that don't have an album are not supported**. To make sure you get valid links, enable filtering by albums or songs when searching on YouTube Music.
 
 ## Configuration
