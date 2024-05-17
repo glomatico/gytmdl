@@ -11,10 +11,11 @@ While this project uses yt-dlp internally, all songs metadata are fetched using 
         * Windows: https://github.com/AnimMouse/ffmpeg-stable-autobuild/releases
         * Linux: https://johnvansickle.com/ffmpeg/
 * (Optional) The cookies file of your YouTube Music browser session
-    * You can get your cookies by using one of the following extensions on your browser of choice at the YouTube website with your account signed in:
+    * You can get your cookies by using one of the following extensions on your browser of choice at the YouTube Music website with your account signed in:
         * Firefox: https://addons.mozilla.org/addon/export-cookies-txt
         * Chromium based browsers: https://chrome.google.com/webstore/detail/gdocmgbfkjnnpapoeobnolbbkoibbcif
     * With cookies, you can download age-restricted content, private playlists and songs in premium formats if you have an active subscription. You will have to set the cookies file path using the command line arguments or the config file (see [Configuration](#configuration)).
+    * YouTube cookies can expire very quickly. As an workaround, export your cookies using your browser's incognito mode.
   
 ## Installation
 Install the package `gytmdl` using pip:
