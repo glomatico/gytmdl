@@ -17,10 +17,10 @@ While this project uses yt-dlp internally, all songs metadata are fetched using 
     * With cookies, you can download age-restricted content, private playlists and songs in premium formats if you have an active subscription. You will have to set the cookies file path using the command line arguments or the config file (see [Configuration](#configuration)).
   
 ## Installation
-1. Install the package `gamdl` using pip
-    ```bash
-    pip install gamdl
-    ```
+Install the package `gamdl` using pip:
+```bash
+pip install gamdl
+```
 
 ## Usage
 ```bash
@@ -29,12 +29,12 @@ gytmdl [OPTIONS] URLS...
 
 ### Examples
 * Download a song:
-    ```
+    ```bash
     gytmdl "https://music.youtube.com/watch?v=3BFTio5296w"
     ```
 
 * Download an album:
-    ```
+    ```bash
     gytmdl "https://music.youtube.com/playlist?list=OLAK5uy_lvpL_Gr_aVEq-LaivwJaSK5EbFd4HeamM"
     ```
 
