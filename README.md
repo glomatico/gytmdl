@@ -1,5 +1,5 @@
 # Glomatico's YouTube Music Downloader
-A Python CLI app for downloading YouTube Music songs with tags from YouTube Music
+A Python CLI app for downloading YouTube Music songs with tags from YouTube Music.
 
 ## Why not just use yt-dlp directly?
 While this project uses yt-dlp internally, all songs metadata are fetched using [YouTube Music's API](https://github.com/sigma67/ytmusicapi), which includes proper square cover, lyrics, track number, total tracks, etc.
