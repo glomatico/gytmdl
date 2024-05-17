@@ -36,7 +36,7 @@ def write_default_config_file(ctx: click.Context):
     ctx.params["config_path"].write_text(json.dumps(config_file, indent=4))
 
 
-def no_config_callback(
+def load_config_file(
     ctx: click.Context,
     param: click.Parameter,
     no_config_file: bool,
@@ -188,7 +188,7 @@ def no_config_callback(
     "--no-config-file",
     "-n",
     is_flag=True,
-    callback=no_config_callback,
+    callback=load_config_file,
     help="Don't load the config file.",
 )
 @click.version_option(__version__)
