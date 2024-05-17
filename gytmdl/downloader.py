@@ -218,7 +218,7 @@ class Downloader:
             "-i",
             temp_path,
         ]
-        if self.itag not in ("140", "141"):
+        if self.itag not in ("141", "140", "139"):
             command.extend(
                 [
                     "-f",
