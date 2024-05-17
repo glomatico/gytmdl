@@ -182,7 +182,7 @@ class Downloader:
         return self.temp_path / f"{video_id}_remuxed.m4a"
 
     def get_cover_path(self, final_path: Path):
-        return final_path.with_suffix(f".{self.cover_format.value}")
+        return final_path.parent / f"Cover.{self.cover_format.value}"
 
     def get_final_path(self, tags: dict) -> Path:
         final_path_folder = self.template_folder.split("/")
