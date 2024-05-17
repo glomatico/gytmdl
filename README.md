@@ -17,9 +17,9 @@ While this project uses yt-dlp internally, all songs metadata are fetched using 
     * With cookies, you can download age-restricted content, private playlists and songs in premium formats if you have an active subscription. You will have to set the cookies file path using the command line arguments or the config file (see [Configuration](#configuration)).
   
 ## Installation
-Install the package `gamdl` using pip:
+Install the package `gytmdl` using pip:
 ```bash
-pip install gamdl
+pip install gytmdl
 ```
 
 ## Usage
@@ -32,7 +32,6 @@ gytmdl [OPTIONS] URLS...
     ```bash
     gytmdl "https://music.youtube.com/watch?v=3BFTio5296w"
     ```
-
 * Download an album:
     ```bash
     gytmdl "https://music.youtube.com/playlist?list=OLAK5uy_lvpL_Gr_aVEq-LaivwJaSK5EbFd4HeamM"
@@ -41,7 +40,7 @@ gytmdl [OPTIONS] URLS...
 **Songs that don't have an album are not supported**. To make sure you get valid links, enable filtering by albums or songs when searching on YouTube Music.
 
 ## Configuration
-gytmdl can be configured by using the command line arguments or the config file. The config file is created automatically when you run gamdl for the first time at `~/.gytmdl/config.json` on Linux and `%USERPROFILE%\.gytmdl\config.json` on Windows. Config file values can be overridden using command line arguments.
+gytmdl can be configured by using the command line arguments or the config file. The config file is created automatically when you run gytmdl for the first time at `~/.gytmdl/config.json` on Linux and `%USERPROFILE%\.gytmdl\config.json` on Windows. Config file values can be overridden using command line arguments.
 | Command line argument / Config file key   | Description                                                                 | Default value                |
 | ----------------------------------------- | --------------------------------------------------------------------------- | ---------------------------- |
 | `--save-cover`, `-s` / `save_cover`       | Save cover as a separate file.                                              | `false`                      |
