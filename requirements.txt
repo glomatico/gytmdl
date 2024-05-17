@@ -1,3 +1,4 @@
 click
+inquirerpy
 yt-dlp
 ytmusicapi
