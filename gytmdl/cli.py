@@ -150,7 +150,7 @@ def no_config_callback(
     "--cover-quality",
     type=int,
     default=downloader_sig.parameters["cover_quality"].default,
-    help="JPEG quality of the cover.",
+    help="Cover JPEG quality.",
 )
 @click.option(
     "--template-folder",
