@@ -65,18 +65,6 @@ gytmdl can be configured by using the command line arguments or the config file.
 | `--truncate` / `truncate`                 | Maximum length of the file/folder names.                                    | `40`                         |
 | `--no-config-file`, `-n` / -              | Don't load the config file.                                                 | `false`                      |
 
-### Itags (audio codec/quality)
-The following free itags are available:
-* `140` (AAC 128kbps)
-* `139` (AAC 48kbps)
-* `251` (Opus 128kbps)
-* `250` (Opus 64kbps)
-* `249` (Opus 48kbps)
-  
-The following premium itags are available if provided a cookies file with an active subscription:
-* `141` (AAC 256kbps)
-* `774` (Opus 256kbps)
-
 ### Tag variables
 The following variables can be used in the template folder/file and/or in the `exclude_tags` list:
 - `album`
@@ -91,6 +79,18 @@ The following variables can be used in the template folder/file and/or in the `e
 - `track`
 - `track_total`
 - `url`
+
+### Itags (audio codec/quality)
+The following free itags are available:
+* `140` (AAC 128kbps)
+* `139` (AAC 48kbps)
+* `251` (Opus 128kbps)
+* `250` (Opus 64kbps)
+* `249` (Opus 48kbps)
+  
+The following premium itags are available if provided a cookies file with an active subscription:
+* `141` (AAC 256kbps)
+* `774` (Opus 256kbps)
 
 ### Cover formats
 The following cover formats are available:
