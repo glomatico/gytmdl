@@ -66,6 +66,8 @@ gytmdl can be configured by using the command line arguments or the config file.
 | `--temp-path` / `temp_path`               | Path to temporary directory.                                                 | `./temp`                     |
 | `--cookies-path`, `-c` / `cookies_path`   | Path to .txt cookies file.                                                   | `null`                       |
 | `--ffmpeg-path` / `ffmpeg_path`           | Path to FFmpeg binary.                                                       | `ffmpeg`                     |
+| `--aria2c-path` / `aria2c_path`           | Path to aria2c binary.                                                       | `aria2c`                     |
+| `--download-mode` / `download_mode`       | Download mode.                                                               | `ytdlp`                      |
 | `--itag`, `-i` / `itag`                   | Itag (audio codec/quality).                                                  | `140`                        |
 | `--cover-size` / `cover_size`             | Cover size.                                                                  | `1200`                       |
 | `--cover-format` / `cover_format`         | Cover format.                                                                | `jpg`                        |
@@ -103,6 +105,13 @@ The following free itags are available:
 The following premium itags are available if provided a cookies file with an active subscription:
 * `141` (AAC 256kbps)
 * `774` (Opus 256kbps)
+
+### Download modes
+The following modes are available:
+* `ytdlp`
+* `aria2c`
+    * Faster than `ytdlp`
+    * Can be obtained from here: https://github.com/aria2/aria2/releases
 
 ### Cover formats
 The following cover formats are available:
