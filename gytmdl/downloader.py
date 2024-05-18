@@ -321,7 +321,7 @@ class Downloader:
     def get_cover_url(self, ytmusic_watch_playlist: dict) -> str:
         return (
             f'{ytmusic_watch_playlist["tracks"][0]["thumbnail"][0]["url"].split("=")[0]}'
-            f'=w{self.cover_size}-l{self.cover_quality}-{"rj" if self.cover_format == "jpg" else "rp"}'
+            f'=w{self.cover_size}-l{self.cover_quality}-{"rj" if self.cover_format == CoverFormat.JPG else "rp"}'
         )
 
     def apply_tags(
