@@ -128,6 +128,12 @@ def load_config_file(
     help="Path to FFmpeg binary.",
 )
 @click.option(
+    "--aria2c-path",
+    type=str,
+    default=downloader_sig.parameters["aria2c_path"].default,
+    help="Path to aria2c binary.",
+)
+@click.option(
     "--download-mode",
     type=DownloadMode,
     default=downloader_sig.parameters["download_mode"].default,
@@ -211,6 +217,7 @@ def main(
     temp_path: Path,
     cookies_path: Path,
     ffmpeg_path: str,
+    aria2c_path: str,
     download_mode: DownloadMode,
     itag: str,
     cover_size: int,
@@ -247,6 +254,7 @@ def main(
         temp_path,
         cookies_path,
         ffmpeg_path,
+        aria2c_path,
         itag,
         download_mode,
         cover_size,

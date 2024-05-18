@@ -27,6 +27,7 @@ class Downloader:
         temp_path: Path = Path("./temp"),
         cookies_path: Path = None,
         ffmpeg_path: str = "ffmpeg",
+        aria2c_path: str = "aria2c",
         itag: str = "140",
         download_mode: DownloadMode = DownloadMode.YTDLP,
         cover_size: int = "1200",
@@ -43,6 +44,7 @@ class Downloader:
         self.temp_path = temp_path
         self.cookies_path = cookies_path
         self.ffmpeg_path = ffmpeg_path
+        self.aria2c_path = aria2c_path
         self.itag = itag
         self.download_mode = download_mode
         self.cover_size = cover_size
@@ -271,7 +273,11 @@ class Downloader:
             {
                 **self.ytdlp_options,
                 "external_downloader": (
-                    "aria2c" if self.download_mode == DownloadMode.ARIA2C else None
+                    {
+                        "default": self.aria2c_path,
+                    }
+                    if self.download_mode == DownloadMode.ARIA2C
+                    else None
                 ),
                 "fixup": "never",
                 "format": self.itag,
