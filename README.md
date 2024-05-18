@@ -17,7 +17,7 @@ While this project uses yt-dlp internally, all songs metadata are fetched using 
         * Firefox: https://addons.mozilla.org/addon/export-cookies-txt
         * Chromium based browsers: https://chrome.google.com/webstore/detail/gdocmgbfkjnnpapoeobnolbbkoibbcif
     * With cookies, you can download age-restricted content, private playlists and songs in premium formats if you have an active subscription. You will have to set the cookies file path using the command line arguments or the config file (see [Configuration](#configuration)).
-    * **YouTube cookies can expire very quickly**. As a workaround, export your cookies using your browser incognito mode.
+    * **YouTube cookies can expire very quickly**. As a workaround, export your cookies in an incognito/annonymous window.
   
 ## Installation
 Install the package `gytmdl` using pip:
