@@ -244,7 +244,7 @@ class Downloader:
                 dirty_string = dirty_string[: self.truncate - 4]
         return dirty_string.strip()
 
-    def get_temp_path(self, video_id: str) -> Path:
+    def get_track_temp_path(self, video_id: str) -> Path:
         return self.temp_path / f"{video_id}_temp.m4a"
 
     def get_remuxed_path(self, video_id: str) -> Path:
