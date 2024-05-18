@@ -298,7 +298,7 @@ def main(
                 continue
             video_id = ytmusic_watch_playlist["tracks"][0]["videoId"]
             tags = downloader.get_tags(ytmusic_watch_playlist)
-            temp_track_path = downloader.get_track_temp_path(video_id)
+            track_temp_path = downloader.get_track_temp_path(video_id)
             remuxed_path = downloader.get_remuxed_path(video_id)
             final_path = downloader.get_final_path(tags)
             cover_url = downloader.get_cover_url(ytmusic_watch_playlist)
@@ -308,10 +308,10 @@ def main(
                     f'({queue_progress}) Song already exists at "{final_path}", skipping'
                 )
             else:
-                logger.debug(f'Downloading to "{temp_track_path}"')
-                downloader.download(video_id, temp_track_path)
+                logger.debug(f'Downloading to "{track_temp_path}"')
+                downloader.download(video_id, track_temp_path)
                 logger.debug(f'Remuxing to "{remuxed_path}"')
-                downloader.remux(temp_track_path, remuxed_path)
+                downloader.remux(track_temp_path, remuxed_path)
                 logger.debug("Applying tags")
                 downloader.apply_tags(remuxed_path, tags, cover_url)
                 logger.debug(f'Moving to "{final_path}"')
