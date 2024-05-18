@@ -239,6 +239,9 @@ def main(
     if not shutil.which(ffmpeg_path):
         logger.critical(X_NOT_FOUND_STRING.format("FFmpeg", ffmpeg_path))
         return
+    if not shutil.which(aria2c_path) and download_mode == DownloadMode.ARIA2C:
+        logger.critical(X_NOT_FOUND_STRING.format("aria2c", aria2c_path))
+        return
     if cookies_path and not cookies_path.exists():
         logger.critical(X_NOT_FOUND_STRING.format("Cookies file", cookies_path))
         return
