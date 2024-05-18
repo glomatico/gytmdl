@@ -47,10 +47,10 @@ gytmdl [OPTIONS] URLS...
 **Songs that are not part of album (standard YouTube videos) are not supported**. To make sure you get valid links, use YouTube Music to search and enable filtering by albums, songs.
 
 ### Interactive prompt controls
-* Enter - Confirm selection
-* Space - Toggle selection
 * Arrow keys - Move selection
+* Space - Toggle selection
 * Ctrl + A - Select all
+* Enter - Confirm selection
 
 ## Configuration
 gytmdl can be configured by using the command line arguments or the config file. The config file is created automatically when you run gytmdl for the first time at `~/.gytmdl/config.json` on Linux and `%USERPROFILE%\.gytmdl\config.json` on Windows. Config file values can be overridden using command line arguments.
