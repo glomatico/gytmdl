@@ -12,7 +12,7 @@ import click
 from . import __version__
 from .constants import EXCLUDED_CONFIG_FILE_PARAMS, X_NOT_FOUND_STRING
 from .downloader import Downloader
-from .enums import CoverFormat
+from .enums import CoverFormat, DownloadMode
 
 downloader_sig = inspect.signature(Downloader.__init__)
 
@@ -128,6 +128,12 @@ def load_config_file(
     help="Path to FFmpeg binary.",
 )
 @click.option(
+    "--download-mode",
+    type=DownloadMode,
+    default=downloader_sig.parameters["download_mode"].default,
+    help="Download mode.",
+)
+@click.option(
     "--itag",
     "-i",
     type=str,
@@ -205,6 +211,7 @@ def main(
     temp_path: Path,
     cookies_path: Path,
     ffmpeg_path: str,
+    download_mode: DownloadMode,
     itag: str,
     cover_size: int,
     cover_format: CoverFormat,
@@ -241,6 +248,7 @@ def main(
         cookies_path,
         ffmpeg_path,
         itag,
+        download_mode,
         cover_size,
         cover_format,
         cover_quality,

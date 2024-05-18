@@ -17,7 +17,7 @@ from yt_dlp.extractor.youtube import YoutubeTabIE
 from ytmusicapi import YTMusic
 
 from .constants import MP4_TAGS_MAP
-from .enums import CoverFormat
+from .enums import CoverFormat, DownloadMode
 
 
 class Downloader:
@@ -28,6 +28,7 @@ class Downloader:
         cookies_path: Path = None,
         ffmpeg_path: str = "ffmpeg",
         itag: str = "140",
+        download_mode: DownloadMode = DownloadMode.YTDLP,
         cover_size: int = "1200",
         cover_format: CoverFormat = CoverFormat.JPG,
         cover_quality: int = 94,
@@ -43,6 +44,7 @@ class Downloader:
         self.cookies_path = cookies_path
         self.ffmpeg_path = ffmpeg_path
         self.itag = itag
+        self.download_mode = download_mode
         self.cover_size = cover_size
         self.cover_format = cover_format
         self.cover_quality = cover_quality
@@ -268,6 +270,9 @@ class Downloader:
         with YoutubeDL(
             {
                 **self.ytdlp_options,
+                "external_downloader": (
+                    "aria2c" if self.download_mode == DownloadMode.ARIA2C else None
+                ),
                 "fixup": "never",
                 "format": self.itag,
                 "outtmpl": str(temp_path),
