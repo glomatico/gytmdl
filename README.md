@@ -54,28 +54,28 @@ gytmdl [OPTIONS] URLS...
 
 ## Configuration
 gytmdl can be configured by using the command line arguments or the config file. The config file is created automatically when you run gytmdl for the first time at `~/.gytmdl/config.json` on Linux and `%USERPROFILE%\.gytmdl\config.json` on Windows. Config file values can be overridden using command line arguments.
-| Command line argument / Config file key   | Description                                                                 | Default value                |
-| ----------------------------------------- | --------------------------------------------------------------------------- | ---------------------------- |
-| `--save-cover`, `-s` / `save_cover`       | Save cover as a separate file.                                              | `false`                      |
-| `--overwrite` / `overwrite`               | Overwrite existing files.                                                   | `false`                      |
-| `--read-urls-as-txt`, `-r` / -            | Interpret URLs as paths to text files containing URLs separated by newlines | `false`                      |
-| `--config-path` / -                       | Path to config file.                                                        | `<home>/.gytmdl/config.json` |
-| `--log-level` / `log_level`               | Log level.                                                                  | `INFO`                       |
-| `--print-exceptions` / `print_exceptions` | Print exceptions.                                                           | `false`                      |
-| `--output-path`, `-o` / `output_path`     | Path to output directory.                                                   | `./YouTube Music`            |
-| `--temp-path` / `temp_path`               | Path to temporary directory.                                                | `./temp`                     |
-| `--cookies-path`, `-c` / `cookies_path`   | Path to .txt cookies file.                                                  | `null`                       |
-| `--ffmpeg-path` / `ffmpeg_path`           | Path to FFmpeg binary.                                                      | `ffmpeg`                     |
-| `--itag`, `-i` / `itag`                   | Itag (audio codec/quality).                                                 | `140`                        |
-| `--cover-size` / `cover_size`             | Cover size.                                                                 | `1200`                       |
-| `--cover-format` / `cover_format`         | Cover format.                                                               | `jpg`                        |
-| `--cover-quality` / `cover_quality`       | Cover JPEG quality.                                                         | `94`                         |
-| `--template-folder` / `template_folder`   | Template of the album folders as a format string.                           | `{album_artist}/{album}`     |
-| `--template-file` / `template_file`       | Template of the song files as a format string.                              | `{track:02d} {title}`        |
-| `--template-date` / `template_date`       | Date tag template.                                                          | `%Y-%m-%dT%H:%M:%SZ`         |
-| `--exclude-tags`, `-e` / `exclude_tags`   | Comma-separated tags to exclude.                                            | `null`                       |
-| `--truncate` / `truncate`                 | Maximum length of the file/folder names.                                    | `40`                         |
-| `--no-config-file`, `-n` / -              | Don't load the config file.                                                 | `false`                      |
+| Command line argument / Config file key   | Description                                                                  | Default value                |
+| ----------------------------------------- | ---------------------------------------------------------------------------- | ---------------------------- |
+| `--save-cover`, `-s` / `save_cover`       | Save cover as a separate file.                                               | `false`                      |
+| `--overwrite` / `overwrite`               | Overwrite existing files.                                                    | `false`                      |
+| `--read-urls-as-txt`, `-r` / -            | Interpret URLs as paths to text files containing URLs separated by newlines. | `false`                      |
+| `--config-path` / -                       | Path to config file.                                                         | `<home>/.gytmdl/config.json` |
+| `--log-level` / `log_level`               | Log level.                                                                   | `INFO`                       |
+| `--print-exceptions` / `print_exceptions` | Print exceptions.                                                            | `false`                      |
+| `--output-path`, `-o` / `output_path`     | Path to output directory.                                                    | `./YouTube Music`            |
+| `--temp-path` / `temp_path`               | Path to temporary directory.                                                 | `./temp`                     |
+| `--cookies-path`, `-c` / `cookies_path`   | Path to .txt cookies file.                                                   | `null`                       |
+| `--ffmpeg-path` / `ffmpeg_path`           | Path to FFmpeg binary.                                                       | `ffmpeg`                     |
+| `--itag`, `-i` / `itag`                   | Itag (audio codec/quality).                                                  | `140`                        |
+| `--cover-size` / `cover_size`             | Cover size.                                                                  | `1200`                       |
+| `--cover-format` / `cover_format`         | Cover format.                                                                | `jpg`                        |
+| `--cover-quality` / `cover_quality`       | Cover JPEG quality.                                                          | `94`                         |
+| `--template-folder` / `template_folder`   | Template of the album folders as a format string.                            | `{album_artist}/{album}`     |
+| `--template-file` / `template_file`       | Template of the song files as a format string.                               | `{track:02d} {title}`        |
+| `--template-date` / `template_date`       | Date tag template.                                                           | `%Y-%m-%dT%H:%M:%SZ`         |
+| `--exclude-tags`, `-e` / `exclude_tags`   | Comma-separated tags to exclude.                                             | `null`                       |
+| `--truncate` / `truncate`                 | Maximum length of the file/folder names.                                     | `40`                         |
+| `--no-config-file`, `-n` / -              | Don't load the config file.                                                  | `false`                      |
 
 ### Tag variables
 The following variables can be used in the template folder/file and/or in the `exclude_tags` list:
