@@ -4,7 +4,7 @@ A Python CLI app for downloading YouTube Music songs with tags from YouTube Musi
 **Discord Server:** https://discord.gg/aBjMEZ9tnq
 
 ## Why not just use yt-dlp directly?
-While this project uses yt-dlp internally, all songs metadata are fetched using [YouTube Music's API](https://github.com/sigma67/ytmusicapi), which includes proper square cover, lyrics, track number, total tracks, etc.
+While this project uses yt-dlp internally, it has the advantage of using [YouTube Music's API](https://github.com/sigma67/ytmusicapi) to get the metadata for songs, which includes the proper high-resolution square cover, lyrics, track number, total tracks, etc.
 
 ## Prerequisites
 * Python 3.8 or higher
