@@ -3,7 +3,7 @@ name = "gytmdl"
 description = "A Python CLI app for downloading YouTube Music songs with tags from YouTube Music"
 requires-python = ">=3.8"
 authors = [{ name = "glomatico" }]
-dependencies = ["click", "inquirerpy", "yt-dlp", "ytmusicapi"]
+dependencies = ["click", "inquirerpy", "pillow", "yt-dlp", "ytmusicapi"]
 readme = "README.md"
 dynamic = ["version"]
 
