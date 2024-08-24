@@ -44,7 +44,7 @@ gytmdl [OPTIONS] URLS...
     gytmdl "https://music.youtube.com/channel/UCwZEU0wAwIyZb4x5G_KJp2w"
     ```
 
-**Songs that are not part of album (standard YouTube videos) are not supported**. To make sure you get valid links, use YouTube Music to search and enable filtering by songs, albums or artists.
+**Songs that are not part of album (standard YouTube videos) are not supported**. To make sure you get valid links, use YouTube Music for searching and enable filtering by songs, albums or artists.
 
 ### Interactive prompt controls
 * Arrow keys - Move selection
@@ -53,7 +53,11 @@ gytmdl [OPTIONS] URLS...
 * Enter - Confirm selection
 
 ## Configuration
-gytmdl can be configured by using the command line arguments or the config file. The config file is created automatically when you run gytmdl for the first time at `~/.gytmdl/config.json` on Linux and `%USERPROFILE%\.gytmdl\config.json` on Windows. Config file values can be overridden using command line arguments.
+gytmdl can be configured by using the command line arguments or the config file.
+
+The config file is created automatically when you run gytmdl for the first time at `~/.gytmdl/config.json` on Linux and `%USERPROFILE%\.gytmdl\config.json` on Windows.
+
+Config file values can be overridden using command line arguments.
 | Command line argument / Config file key   | Description                                                                  | Default value                |
 | ----------------------------------------- | ---------------------------------------------------------------------------- | ---------------------------- |
 | `--save-cover`, `-s` / `save_cover`       | Save cover as a separate file.                                               | `false`                      |
@@ -119,5 +123,5 @@ The following cover formats are available:
 * `png`
 * `raw`
     * This format gets the raw cover without any processing.
-    * Note that when using this format, the cover image will not be embedded within the files. To address this, you can enable `save_cover` option to save the cover as a separate file.
+    * Note that when using this format, the cover image will not be embedded within the files. To address this, you can enable the `save_cover` option to save the cover as a separate file.
 
