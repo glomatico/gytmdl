@@ -20,3 +20,8 @@ MP4_TAGS_MAP = {
 }
 
 X_NOT_FOUND_STRING = '{} not found at "{}"'
+
+IMAGE_FILE_EXTENSION_MAP = {
+    "jpeg": ".jpg",
+    "tiff": ".tif",
+}

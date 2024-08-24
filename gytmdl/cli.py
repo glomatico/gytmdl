@@ -302,7 +302,8 @@ def main(
             remuxed_path = downloader.get_remuxed_path(video_id)
             final_path = downloader.get_final_path(tags)
             cover_url = downloader.get_cover_url(ytmusic_watch_playlist)
-            cover_path = downloader.get_cover_path(final_path)
+            cover_file_extension = downloader.get_cover_file_extension(cover_url)
+            cover_path = downloader.get_cover_path(final_path, cover_file_extension)
             if final_path.exists() and not overwrite:
                 logger.warning(
                     f'({queue_progress}) Song already exists at "{final_path}", skipping'

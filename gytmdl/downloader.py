@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 import functools
+import io
 import re
 import shutil
 import subprocess
@@ -12,11 +13,12 @@ import requests
 from InquirerPy import inquirer
 from InquirerPy.base.control import Choice
 from mutagen.mp4 import MP4, MP4Cover
+from PIL import Image
 from yt_dlp import YoutubeDL
 from yt_dlp.extractor.youtube import YoutubeTabIE
 from ytmusicapi import YTMusic
 
-from .constants import MP4_TAGS_MAP
+from .constants import IMAGE_FILE_EXTENSION_MAP, MP4_TAGS_MAP
 from .enums import CoverFormat, DownloadMode
 
 
@@ -251,8 +253,8 @@ class Downloader:
     def get_remuxed_path(self, video_id: str) -> Path:
         return self.temp_path / f"{video_id}_remuxed.m4a"
 
-    def get_cover_path(self, final_path: Path):
-        return final_path.parent / f"Cover.{self.cover_format.value}"
+    def get_cover_path(self, final_path: Path, file_extension: str) -> Path:
+        return final_path.parent / ("Cover" + file_extension)
 
     def get_final_path(self, tags: dict) -> Path:
         final_path_folder = self.template_folder.split("/")
@@ -316,14 +318,23 @@ class Downloader:
 
     @staticmethod
     @functools.lru_cache()
-    def _get_url_response_bytes(url: str) -> bytes:
+    def get_url_response_bytes(url: str) -> bytes:
         return requests.get(url).content
 
     def get_cover_url(self, ytmusic_watch_playlist: dict) -> str:
         return (
             f'{ytmusic_watch_playlist["tracks"][0]["thumbnail"][0]["url"].split("=")[0]}'
-            f'=w{self.cover_size}-l{self.cover_quality}-{"rj" if self.cover_format == CoverFormat.JPG else "rp"}'
+            + (
+                "=d"
+                if self.cover_format == CoverFormat.RAW
+                else f'=w{self.cover_size}-l{self.cover_quality}-{"rj" if self.cover_format == CoverFormat.JPG else "rp"}'
+            )
         )
+
+    def get_cover_file_extension(self, cover_url: str) -> str:
+        image_obj = Image.open(io.BytesIO(self.get_url_response_bytes(cover_url)))
+        image_format = image_obj.format.lower()
+        return IMAGE_FILE_EXTENSION_MAP.get(image_format, f".{image_format}")
 
     def apply_tags(
         self,
@@ -355,10 +366,10 @@ class Downloader:
                 and tags.get(tag_name) is not None
             ):
                 mp4_tags[MP4_TAGS_MAP[tag_name]] = [tags[tag_name]]
-        if "cover" not in self.exclude_tags:
+        if "cover" not in self.exclude_tags and self.cover_format != CoverFormat.RAW:
             mp4_tags["covr"] = [
                 MP4Cover(
-                    self._get_url_response_bytes(cover_url),
+                    self.get_url_response_bytes(cover_url),
                     imageformat=(
                         MP4Cover.FORMAT_JPEG
                         if self.cover_format == CoverFormat.JPG
@@ -381,7 +392,7 @@ class Downloader:
 
     @functools.lru_cache()
     def save_cover(self, cover_path: Path, cover_url: str):
-        cover_path.write_bytes(self._get_url_response_bytes(cover_url))
+        cover_path.write_bytes(self.get_url_response_bytes(cover_url))
 
     def cleanup_temp_path(self):
         shutil.rmtree(self.temp_path)
