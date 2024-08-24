@@ -12,7 +12,7 @@ While this project uses yt-dlp internally, it has the advantage of using [YouTub
     * Up to date binaries can be obtained from the links below:
         * Windows: https://github.com/AnimMouse/ffmpeg-stable-autobuild/releases
         * Linux: https://johnvansickle.com/ffmpeg/
-* (Optional) The cookies file of your YouTube Music browser session
+* (Optional) The cookies file of your YouTube Music browser session in Netscape format
     * You can get your cookies by using one of the following extensions on your browser of choice at the YouTube Music website with your account signed in:
         * Firefox: https://addons.mozilla.org/addon/export-cookies-txt
         * Chromium based browsers: https://chrome.google.com/webstore/detail/gdocmgbfkjnnpapoeobnolbbkoibbcif
