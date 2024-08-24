@@ -76,7 +76,7 @@ gytmdl can be configured by using the command line arguments or the config file.
 | `--template-file` / `template_file`       | Template of the song files as a format string.                               | `{track:02d} {title}`        |
 | `--template-date` / `template_date`       | Date tag template.                                                           | `%Y-%m-%dT%H:%M:%SZ`         |
 | `--exclude-tags`, `-e` / `exclude_tags`   | Comma-separated tags to exclude.                                             | `null`                       |
-| `--truncate` / `truncate`                 | Maximum length of the file/folder names.                                     | `40`                         |
+| `--truncate` / `truncate`                 | Maximum length of the file/folder names.                                     | `null`                       |
 | `--no-config-file`, `-n` / -              | Don't load the config file.                                                  | `false`                      |
 
 ### Tag variables
@@ -117,4 +117,7 @@ The following modes are available:
 The following cover formats are available:
 * `jpg`
 * `png`
+* `raw`
+    * This format gets the raw cover without any processing.
+    * Note that when using this format, the cover image will not be embedded within the files. To address this, you can enable `save_cover` option to save the cover as a separate file.
 
