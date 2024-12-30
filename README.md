@@ -44,7 +44,7 @@ gytmdl [OPTIONS] URLS...
     gytmdl "https://music.youtube.com/channel/UCwZEU0wAwIyZb4x5G_KJp2w"
     ```
 
-**Songs that are not part of album (standard YouTube videos) are not supported**. To make sure you get valid links, use YouTube Music for searching and enable filtering by songs, albums or artists.
+**Songs that are not part of an album (standard YouTube videos) are not supported**. To make sure you get valid links, use YouTube Music for searching and enable filtering by songs, albums or artists.
 
 ### Interactive prompt controls
 * Arrow keys - Move selection
