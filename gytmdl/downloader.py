@@ -223,10 +223,10 @@ class Downloader:
                     tags["rating"] = 0
                 tags["track"] = index + 1
                 break
-        if ytmusic_watch_playlist["lyrics"]:
-            lyrics = self.ytmusic.get_lyrics(ytmusic_watch_playlist["lyrics"])["lyrics"]
-            if lyrics is not None:
-                tags["lyrics"] = lyrics
+        if ytmusic_watch_playlist.get("lyrics"):
+            lyrics_ytmusic = self.ytmusic.get_lyrics(ytmusic_watch_playlist["lyrics"])
+            if lyrics_ytmusic is not None and lyrics_ytmusic.get("lyrics"):
+                tags["lyrics"] = lyrics_ytmusic["lyrics"]
         datetime_obj = (
             self._get_datetime_obj(ytmusic_album["year"])
             if ytmusic_album.get("year")
