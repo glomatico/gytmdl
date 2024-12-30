@@ -1,5 +1,6 @@
 click
 inquirerpy
+mutagen
 pillow
 yt-dlp
 ytmusicapi
