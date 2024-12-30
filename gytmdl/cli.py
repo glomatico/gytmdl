@@ -96,9 +96,9 @@ def load_config_file(
     help="Log level.",
 )
 @click.option(
-    "--print-exceptions",
+    "--no-exceptions",
     is_flag=True,
-    help="Print exceptions.",
+    help="Don't print exceptions.",
 )
 # Downloader specific options
 @click.option(
@@ -212,7 +212,7 @@ def main(
     read_urls_as_txt: bool,
     config_path: Path,
     log_level: str,
-    print_exceptions: bool,
+    no_exceptions: bool,
     output_path: Path,
     temp_path: Path,
     cookies_path: Path,
@@ -280,7 +280,7 @@ def main(
             error_count += 1
             logger.error(
                 f'({url_progress}) Failed to check "{url}"',
-                exc_info=print_exceptions,
+                exc_info=not no_exceptions,
             )
             continue
     for queue_index, queue_item in enumerate(download_queue, start=1):
@@ -328,7 +328,7 @@ def main(
             error_count += 1
             logger.error(
                 f'({queue_progress}) Failed to download "{queue_item["title"]}"',
-                exc_info=print_exceptions,
+                exc_info=not no_exceptions,
             )
         finally:
             if temp_path.exists():
