@@ -74,7 +74,7 @@ class Downloader:
             "allowed_extractors": ["youtube", "youtube:tab"],
             "extractor_args": {
                 "youtube": {
-                    "player_client": ["android"],
+                    "player_client": ["mweb"],
                 },
             },
         }
