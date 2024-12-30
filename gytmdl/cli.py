@@ -251,7 +251,7 @@ def main(
             if Path(url).exists():
                 _urls.extend(Path(url).read_text().splitlines())
         urls = _urls
-    logger.debug("Starting downloader")
+    logger.info("Starting Gytmdl")
     downloader = Downloader(
         output_path,
         temp_path,
