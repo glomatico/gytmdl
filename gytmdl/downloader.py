@@ -248,7 +248,11 @@ class Downloader:
             ytmusic_watch_playlist["lyrics"],
             True,
         )
-        if lyrics_ytmusic is not None and lyrics_ytmusic.get("lyrics"):
+        if (
+            lyrics_ytmusic is not None
+            and lyrics_ytmusic.get("lyrics")
+            and lyrics_ytmusic.get("hasTimestamps")
+        ):
             return (
                 "\n".join(
                     [
