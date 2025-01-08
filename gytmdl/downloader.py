@@ -236,6 +236,38 @@ class Downloader:
             tags["date"] = datetime_obj.strftime(self.template_date)
         return tags
 
+    def get_lyrics_synced_timestamp_lrc(self, time: int) -> str:
+        lrc_timestamp = datetime.datetime.fromtimestamp(
+            time / 1000.0,
+            tz=datetime.timezone.utc,
+        )
+        return lrc_timestamp.strftime("%M:%S.%f")[:-4]
+
+    def get_synced_lyrics(self, ytmusic_watch_playlist: dict) -> str:
+        lyrics_ytmusic = self.ytmusic.get_lyrics(
+            ytmusic_watch_playlist["lyrics"],
+            True,
+        )
+        if lyrics_ytmusic is not None and lyrics_ytmusic.get("lyrics"):
+            return (
+                "\n".join(
+                    [
+                        f"[{self.get_lyrics_synced_timestamp_lrc(i.start_time)}]{i.text}"
+                        for i in lyrics_ytmusic["lyrics"]
+                    ]
+                )
+                + "\n"
+            )
+        return None
+
+    def get_synced_lyrics_path(self, final_path: Path) -> Path:
+        return final_path.with_suffix(".lrc")
+
+    def save_synced_lyrics(self, synced_lyrics_path: Path, synced_lyrics: str):
+        if synced_lyrics:
+            synced_lyrics_path.parent.mkdir(parents=True, exist_ok=True)
+            synced_lyrics_path.write_text(synced_lyrics, encoding="utf8")
+
     def get_sanitized_string(self, dirty_string: str, is_folder: bool) -> str:
         dirty_string = re.sub(r'[\\/:*?"<>|;]', "_", dirty_string)
         if is_folder:

@@ -190,6 +190,16 @@ def load_config_file(
     help="Comma-separated tags to exclude.",
 )
 @click.option(
+    "--no-synced-lyrics",
+    is_flag=True,
+    help="Don't save synced lyrics.",
+)
+@click.option(
+    "--synced-lyrics-only",
+    is_flag=True,
+    help="Skip track download and only save synced lyrics.",
+)
+@click.option(
     "--truncate",
     type=int,
     default=downloader_sig.parameters["truncate"].default,
@@ -227,6 +237,8 @@ def main(
     template_file: str,
     template_date: str,
     exclude_tags: str,
+    no_synced_lyrics: bool,
+    synced_lyrics_only: bool,
     truncate: int,
     no_config_file: bool,
 ):
@@ -296,19 +308,20 @@ def main(
                     f"({queue_progress}) Track doesn't have an album or is not available, skipping"
                 )
                 continue
-            video_id = ytmusic_watch_playlist["tracks"][0]["videoId"]
             tags = downloader.get_tags(ytmusic_watch_playlist)
-            track_temp_path = downloader.get_track_temp_path(video_id)
-            remuxed_path = downloader.get_remuxed_path(video_id)
             final_path = downloader.get_final_path(tags)
-            cover_url = downloader.get_cover_url(ytmusic_watch_playlist)
-            cover_file_extension = downloader.get_cover_file_extension(cover_url)
-            cover_path = downloader.get_cover_path(final_path, cover_file_extension)
-            if final_path.exists() and not overwrite:
-                logger.warning(
-                    f'({queue_progress}) Song already exists at "{final_path}", skipping'
-                )
+            synced_lyrics_path = downloader.get_synced_lyrics_path(final_path)
+            if synced_lyrics_only:
+                pass
+            elif final_path.exists() and not overwrite:
+                logger.warning(f'Track already exists at "{final_path}", skipping')
             else:
+                video_id = ytmusic_watch_playlist["tracks"][0]["videoId"]
+                track_temp_path = downloader.get_track_temp_path(video_id)
+                remuxed_path = downloader.get_remuxed_path(video_id)
+                cover_url = downloader.get_cover_url(ytmusic_watch_playlist)
+                cover_file_extension = downloader.get_cover_file_extension(cover_url)
+                cover_path = downloader.get_cover_path(final_path, cover_file_extension)
                 logger.debug(f'Downloading to "{track_temp_path}"')
                 downloader.download(video_id, track_temp_path)
                 logger.debug(f'Remuxing to "{remuxed_path}"')
@@ -317,6 +330,18 @@ def main(
                 downloader.apply_tags(remuxed_path, tags, cover_url)
                 logger.debug(f'Moving to "{final_path}"')
                 downloader.move_to_output_path(remuxed_path, final_path)
+            if no_synced_lyrics or not tags.get("lyrics"):
+                pass
+            elif synced_lyrics_path.exists() and not overwrite:
+                logger.debug(
+                    f'Synced lyrics already exists at "{synced_lyrics_path}", skipping'
+                )
+            else:
+                logger.debug("Getting synced lyrics")
+                synced_lyrics = downloader.get_synced_lyrics(ytmusic_watch_playlist)
+                if synced_lyrics:
+                    logger.debug(f'Saving synced lyrics to "{synced_lyrics_path}"')
+                    downloader.save_synced_lyrics(synced_lyrics_path, synced_lyrics)
             if not save_cover:
                 pass
             elif cover_path.exists() and not overwrite:
