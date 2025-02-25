@@ -74,7 +74,8 @@ class Downloader:
             "allowed_extractors": ["youtube", "youtube:tab"],
             "extractor_args": {
                 "youtube": {
-                    "player_client": ["tv"],
+                    "player_client": ["web_music"],
+                    "formats": ["missing_pot"],
                 },
             },
         }
