@@ -1,24 +1,29 @@
-# Glomatico's YouTube Music Downloader
+# Glomatico’s YouTube Music Downloader
 A Python CLI app for downloading YouTube Music songs with tags from YouTube Music.
 
 **Discord Server:** https://discord.gg/aBjMEZ9tnq
 
-## Why not just use yt-dlp directly?
-While this project uses yt-dlp internally, it has the advantage of using [YouTube Music's API](https://github.com/sigma67/ytmusicapi) to get the metadata for songs, which includes the proper high-resolution square cover, lyrics, track number, total tracks, etc.
+## Features
+* **Precise metadata**: [YouTube Music API](https://github.com/sigma67/ytmusicapi) is used to get accurate metadata that yt-dlp alone can’t provide, like high-resolution square covers, lyrics, track numbers, and total track counts.
+* **Synced Lyrics**: Download synced lyrics in LRC.
+* **Artist Support**: Download all albums or music videos from an artist using their link.
+* **Highly Customizable**: Extensive configuration options for advanced users.
 
 ## Prerequisites
-* Python 3.8 or higher
-* FFmpeg on your system PATH
-    * Up to date binaries can be obtained from the links below:
-        * Windows: https://github.com/AnimMouse/ffmpeg-stable-autobuild/releases
-        * Linux: https://johnvansickle.com/ffmpeg/
-* (Optional) The cookies file of your YouTube Music browser session in Netscape format
-    * You can get your cookies by using one of the following extensions on your browser of choice at the YouTube Music website with your account signed in:
-        * Firefox: https://addons.mozilla.org/addon/export-cookies-txt
-        * Chromium based browsers: https://chrome.google.com/webstore/detail/gdocmgbfkjnnpapoeobnolbbkoibbcif
-    * With cookies, you can download age-restricted content, private playlists and songs in premium formats if you have an active subscription. You will have to set the cookies file path using the command line arguments or the config file (see [Configuration](#configuration)).
-    * **YouTube cookies can expire very quickly**. As a workaround, export your cookies in an incognito/anonymous window.
-  
+* **Python 3.9 or higher** installed on your system.
+* **FFmpeg** on your system PATH.
+    * **Windows**: Download from [AnimMouse’s FFmpeg Builds](https://github.com/AnimMouse/ffmpeg-stable-autobuild/releases).
+    * **Linux**: Download from [John Van Sickle’s FFmpeg Builds](https://johnvansickle.com/ffmpeg/).
+* (Optional) The **cookies file** of your YouTube Music browser session in Netscape format (requires an active subscription).
+    * **Firefox**: Use the [Export Cookies](https://addons.mozilla.org/addon/export-cookies-txt) extension.
+    * **Chromium-based Browsers**: Use the [Open Cookies.txt](https://chromewebstore.google.com/detail/open-cookiestxt/gdocmgbfkjnnpapoeobnolbbkoibbcif) extension.
+    * With cookies, you can download **age-restricted content**, **private playlists**, and songs in **premium formats** if you have an active Premium subscription. You’ll have to set the cookies file path using the command line arguments or the config file (see [Configuration](#configuration)).
+    * **YouTube cookies can expire very quickly**. As a workaround, export your cookies in an incognito/anonymous window so they don’t expire as quickly.
+
+### Optional dependencies
+The following tools are optional but required for specific features. Add them to your system’s PATH or specify their paths using command-line arguments or the config file.
+* [aria2](https://aria2.github.io/): Required for `aria2c` download mode.
+
 ## Installation
 Install the package `gytmdl` using pip:
 ```bash
@@ -26,9 +31,18 @@ pip install gytmdl
 ```
 
 ## Usage
+Run Gytmdl with the following command:
 ```bash
 gytmdl [OPTIONS] URLS...
 ```
+
+### Supported URL types
+* Song
+* Album
+* Playlist
+* Artist
+
+**Songs that are not part of an album (standard YouTube videos) are not supported**. To make sure you get valid links, use YouTube Music for searching and enable filtering by songs, albums or artists.
 
 ### Examples
 * Download a song:
@@ -44,18 +58,16 @@ gytmdl [OPTIONS] URLS...
     gytmdl "https://music.youtube.com/channel/UCwZEU0wAwIyZb4x5G_KJp2w"
     ```
 
-**Songs that are not part of an album (standard YouTube videos) are not supported**. To make sure you get valid links, use YouTube Music for searching and enable filtering by songs, albums or artists.
-
 ### Interactive prompt controls
-* Arrow keys - Move selection
-* Space - Toggle selection
-* Ctrl + A - Select all
-* Enter - Confirm selection
+* **Arrow keys**: Move selection
+* **Space**: Toggle selection
+* **Ctrl + A**: Select all
+* **Enter**: Confirm selection
 
 ## Configuration
-gytmdl can be configured by using the command line arguments or the config file.
+Gytmdl can be configured by using the command line arguments or the config file.
 
-The config file is created automatically when you run gytmdl for the first time at `~/.gytmdl/config.json` on Linux and `%USERPROFILE%\.gytmdl\config.json` on Windows.
+The config file is created automatically when you run Gytmdl for the first time at `~/.gytmdl/config.json` on Linux/macOS and `%USERPROFILE%\.gytmdl\config.json` on Windows.
 
 Config file values can be overridden using command line arguments.
 | Command line argument / Config file key       | Description                                                                  | Default value                |
@@ -87,43 +99,36 @@ Config file values can be overridden using command line arguments.
 
 ### Tag variables
 The following variables can be used in the template folder/file and/or in the `exclude_tags` list:
-- `album`
-- `album_artist`
-- `artist`
-- `cover`
-- `date`
-- `lyrics`
-- `media_type`
-- `rating`
-- `title`
-- `track`
-- `track_total`
-- `url`
+* `album`
+* `album_artist`
+* `artist`
+* `cover`
+* `date`
+* `lyrics`
+* `media_type`
+* `rating`
+* `title`
+* `track`
+* `track_total`
+* `url`
 
 ### Itags (audio codec/quality)
-The following free itags are available:
-* `140` (AAC 128kbps)
-* `139` (AAC 48kbps)
-* `251` (Opus 128kbps)
-* `250` (Opus 64kbps)
-* `249` (Opus 48kbps)
-  
-The following premium itags are available if provided a cookies file with an active subscription:
-* `141` (AAC 256kbps)
-* `774` (Opus 256kbps)
+* Free itags:
+    * `140`: (AAC 128kbps)
+    * `139`: (AAC 48kbps)
+    * `251`: (Opus 128kbps)
+    * `250`: (Opus 64kbps)
+    * `249`: (Opus 48kbps)
+* Premium itags (requires cookies and an active Premium subscription):
+    * `141`: (AAC 256kbps)
+    * `774`: (Opus 256kbps)
 
 ### Download modes
-The following modes are available:
-* `ytdlp`
-* `aria2c`
-    * Faster than `ytdlp`
-    * Can be obtained from here: https://github.com/aria2/aria2/releases
+* `ytdlp`: Default download mode.
+* `aria2c`: Faster than `ytdlp`.
 
 ### Cover formats
-The following cover formats are available:
-* `jpg`
-* `png`
-* `raw`
-    * This format gets the raw cover without any processing.
-    * Note that when using this format, the cover image will not be embedded within the files. To address this, you can enable the `save_cover` option to save the cover as a separate file.
+* `jpg`: Default format.
+* `png`: Lossless format.
+* `raw`: Raw cover without processing (requires `save_cover` to save separately).
 
