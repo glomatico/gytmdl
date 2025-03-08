@@ -6,7 +6,7 @@ A Python CLI app for downloading YouTube Music songs with tags from YouTube Musi
 ## Features
 * **Precise metadata**: [YouTube Music API](https://github.com/sigma67/ytmusicapi) is used to get accurate metadata that yt-dlp alone can’t provide, like high-resolution square covers, lyrics, track numbers, and total track counts.
 * **Synced Lyrics**: Download synced lyrics in LRC.
-* **Artist Support**: Download all albums or music videos from an artist using their link.
+* **Artist Support**: Download all albums of an artist using their link.
 * **Highly Customizable**: Extensive configuration options for advanced users.
 
 ## Prerequisites
