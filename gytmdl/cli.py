@@ -8,11 +8,14 @@ from enum import Enum
 from pathlib import Path
 
 import click
+import colorama
 
 from . import __version__
 from .constants import EXCLUDED_CONFIG_FILE_PARAMS, X_NOT_FOUND_STRING
+from .custom_formatter import CustomFormatter
 from .downloader import Downloader
 from .enums import CoverFormat, DownloadMode
+from .utils import color_text
 
 downloader_sig = inspect.signature(Downloader.__init__)
 
@@ -242,12 +245,12 @@ def main(
     truncate: int,
     no_config_file: bool,
 ):
-    logging.basicConfig(
-        format="[%(levelname)-8s %(asctime)s] %(message)s",
-        datefmt="%H:%M:%S",
-    )
+    colorama.just_fix_windows_console()
     logger = logging.getLogger(__name__)
     logger.setLevel(log_level)
+    stream_handler = logging.StreamHandler()
+    stream_handler.setFormatter(CustomFormatter())
+    logger.addHandler(stream_handler)
     if not shutil.which(ffmpeg_path):
         logger.critical(X_NOT_FOUND_STRING.format("FFmpeg", ffmpeg_path))
         return
@@ -284,7 +287,7 @@ def main(
     error_count = 0
     download_queue = []
     for url_index, url in enumerate(urls, start=1):
-        url_progress = f"URL {url_index}/{len(urls)}"
+        url_progress = color_text(f"URL {url_index}/{len(urls)}", colorama.Style.DIM)
         try:
             logger.info(f'({url_progress}) Checking "{url}"')
             download_queue = list(downloader.get_download_queue(url))
@@ -296,7 +299,10 @@ def main(
             )
             continue
     for queue_index, queue_item in enumerate(download_queue, start=1):
-        queue_progress = f"Track {queue_index}/{len(download_queue)} from URL {url_index}/{len(urls)}"
+        queue_progress = color_text(
+            f"Track {queue_index}/{len(download_queue)} from URL {url_index}/{len(urls)}",
+            colorama.Style.DIM,
+        )
         try:
             logger.info(f'({queue_progress}) Downloading "{queue_item["title"]}"')
             logger.debug("Getting tags")
@@ -314,7 +320,9 @@ def main(
             if synced_lyrics_only:
                 pass
             elif final_path.exists() and not overwrite:
-                logger.warning(f'Track already exists at "{final_path}", skipping')
+                logger.warning(
+                    f'({queue_progress}) Track already exists at "{final_path}", skipping'
+                )
             else:
                 video_id = ytmusic_watch_playlist["tracks"][0]["videoId"]
                 track_temp_path = downloader.get_track_temp_path(video_id)
