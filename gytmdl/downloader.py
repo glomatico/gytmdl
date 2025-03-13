@@ -71,7 +71,7 @@ class Downloader:
 
     def _set_ytdlp_options(self):
         extractor_args = {}
-        if self.itag in PREMIUM_FORMATS:
+        if self.itag in PREMIUM_FORMATS or self.cookies_path is not None:
             extractor_args["player_client"] = ["web_music"]
             if self.po_token is None:
                 extractor_args["formats"] = ["missing_pot"]

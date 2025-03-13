@@ -258,10 +258,10 @@ def main(
     stream_handler = logging.StreamHandler()
     stream_handler.setFormatter(CustomFormatter())
     logger.addHandler(stream_handler)
-    if itag in PREMIUM_FORMATS and not cookies_path:
+    if itag in PREMIUM_FORMATS and cookies_path is None:
         logger.critical("Cookies file is required for premium formats")
         return
-    if itag in PREMIUM_FORMATS and not po_token:
+    if po_token is None and cookies_path is not None:
         logger.warning("PO Token not provided, downloading may fail")
     if not shutil.which(ffmpeg_path):
         logger.critical(X_NOT_FOUND_STRING.format("FFmpeg", ffmpeg_path))
