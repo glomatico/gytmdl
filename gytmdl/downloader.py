@@ -17,6 +17,7 @@ from PIL import Image
 from yt_dlp import YoutubeDL
 from yt_dlp.extractor.youtube import YoutubeTabIE
 from ytmusicapi import YTMusic
+from .constants import PREMIUM_FORMATS
 
 from .constants import IMAGE_FILE_EXTENSION_MAP, MP4_TAGS_MAP
 from .enums import CoverFormat, DownloadMode
@@ -32,6 +33,7 @@ class Downloader:
         aria2c_path: str = "aria2c",
         itag: str = "140",
         download_mode: DownloadMode = DownloadMode.YTDLP,
+        po_token: str = None,
         cover_size: int = "1200",
         cover_format: CoverFormat = CoverFormat.JPG,
         cover_quality: int = 94,
@@ -49,6 +51,7 @@ class Downloader:
         self.aria2c_path = aria2c_path
         self.itag = itag
         self.download_mode = download_mode
+        self.po_token = po_token
         self.cover_size = cover_size
         self.cover_format = cover_format
         self.cover_quality = cover_quality
@@ -67,17 +70,21 @@ class Downloader:
         self.ytmusic = YTMusic()
 
     def _set_ytdlp_options(self):
+        extractor_args = {}
+        if self.itag in PREMIUM_FORMATS:
+            extractor_args["player_client"] = ["web_music"]
+            if self.po_token is None:
+                extractor_args["formats"] = ["missing_pot"]
+            else:
+                extractor_args["po_token"] = [self.po_token]
+        else:
+            extractor_args["player_client"] = ["tv"]
         self.ytdlp_options = {
             "quiet": True,
             "no_warnings": True,
             "noprogress": self.silent,
             "allowed_extractors": ["youtube", "youtube:tab"],
-            "extractor_args": {
-                "youtube": {
-                    "player_client": ["web_music"],
-                    "formats": ["missing_pot"],
-                },
-            },
+            "extractor_args": {"youtube": extractor_args},
         }
         if self.cookies_path is not None:
             self.ytdlp_options["cookiefile"] = str(self.cookies_path)

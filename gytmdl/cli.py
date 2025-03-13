@@ -11,7 +11,7 @@ import click
 import colorama
 
 from . import __version__
-from .constants import EXCLUDED_CONFIG_FILE_PARAMS, X_NOT_FOUND_STRING
+from .constants import EXCLUDED_CONFIG_FILE_PARAMS, X_NOT_FOUND_STRING, PREMIUM_FORMATS
 from .custom_formatter import CustomFormatter
 from .downloader import Downloader
 from .enums import CoverFormat, DownloadMode
@@ -143,6 +143,12 @@ def load_config_file(
     help="Download mode.",
 )
 @click.option(
+    "--po-token",
+    type=str,
+    default=downloader_sig.parameters["po_token"].default,
+    help="Proof of Origin (PO) Token.",
+)
+@click.option(
     "--itag",
     "-i",
     type=str,
@@ -232,6 +238,7 @@ def main(
     ffmpeg_path: str,
     aria2c_path: str,
     download_mode: DownloadMode,
+    po_token: str,
     itag: str,
     cover_size: int,
     cover_format: CoverFormat,
@@ -251,6 +258,11 @@ def main(
     stream_handler = logging.StreamHandler()
     stream_handler.setFormatter(CustomFormatter())
     logger.addHandler(stream_handler)
+    if itag in PREMIUM_FORMATS and not cookies_path:
+        logger.critical("Cookies file is required for premium formats")
+        return
+    if itag in PREMIUM_FORMATS and not po_token:
+        logger.warning("PO Token not provided, downloading may fail")
     if not shutil.which(ffmpeg_path):
         logger.critical(X_NOT_FOUND_STRING.format("FFmpeg", ffmpeg_path))
         return
@@ -275,6 +287,7 @@ def main(
         aria2c_path,
         itag,
         download_mode,
+        po_token,
         cover_size,
         cover_format,
         cover_quality,

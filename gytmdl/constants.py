@@ -25,3 +25,5 @@ IMAGE_FILE_EXTENSION_MAP = {
     "jpeg": ".jpg",
     "tiff": ".tif",
 }
+
+PREMIUM_FORMATS = ["141", "774"]
