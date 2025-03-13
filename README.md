@@ -19,6 +19,7 @@ A Python CLI app for downloading YouTube Music songs with tags from YouTube Musi
     * **Chromium-based Browsers**: Use the [Open Cookies.txt](https://chromewebstore.google.com/detail/open-cookiestxt/gdocmgbfkjnnpapoeobnolbbkoibbcif) extension.
     * With cookies, you can download **age-restricted content**, **private playlists**, and songs in **premium formats** if you have an active Premium subscription. You’ll have to set the cookies file path using the command line arguments or the config file (see [Configuration](#configuration)).
     * **YouTube cookies can expire very quickly**. As a workaround, export your cookies in an incognito/anonymous window so they don’t expire as quickly.
+    *  **You may need to provide a PO token** by using the command line arguments or the config file if you encounter issues when downloading with cookies. To get a PO token, you can follow yt-dlp's instructions [here](https://github.com/yt-dlp/yt-dlp/wiki/PO-Token-Guide).
 
 ### Optional dependencies
 The following tools are optional but required for specific features. Add them to your system’s PATH or specify their paths using command-line arguments or the config file.
@@ -84,6 +85,7 @@ Config file values can be overridden using command line arguments.
 | `--ffmpeg-path` / `ffmpeg_path`               | Path to FFmpeg binary.                                                       | `ffmpeg`                     |
 | `--aria2c-path` / `aria2c_path`               | Path to aria2c binary.                                                       | `aria2c`                     |
 | `--download-mode` / `download_mode`           | Download mode.                                                               | `ytdlp`                      |
+| `--po-token` / `po_token`                     | Proof of Origin (PO) Token.                                                  | `null`                       |
 | `--itag`, `-i` / `itag`                       | Itag (audio codec/quality).                                                  | `140`                        |
 | `--cover-size` / `cover_size`                 | Cover size.                                                                  | `1200`                       |
 | `--cover-format` / `cover_format`             | Cover format.                                                                | `jpg`                        |
@@ -131,4 +133,3 @@ The following variables can be used in the template folder/file and/or in the `e
 * `jpg`: Default format.
 * `png`: Lossless format.
 * `raw`: Raw cover without processing (requires `save_cover` to save separately).
-
