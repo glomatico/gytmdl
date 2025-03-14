@@ -218,6 +218,7 @@ class Downloader:
             "media_type": 1,
             "title": ytmusic_watch_playlist["tracks"][0]["title"],
             "track_total": ytmusic_album["trackCount"],
+            "video_id": video_id,
         }
         for index, entry in enumerate(
             self._get_ytdlp_info(
