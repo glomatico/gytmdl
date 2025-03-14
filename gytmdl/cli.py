@@ -269,9 +269,14 @@ def main(
     if download_mode == DownloadMode.ARIA2C and not shutil.which(aria2c_path):
         logger.critical(X_NOT_FOUND_STRING.format("aria2c", aria2c_path))
         return
-    if cookies_path and not cookies_path.exists():
-        logger.critical(X_NOT_FOUND_STRING.format("Cookies file", cookies_path))
-        return
+    while not cookies_path.exists():
+        cookies_path_str = click.prompt(
+            X_NOT_FOUND_STRING.format("Cookies file", cookies_path.absolute())
+            + ". Move it to that location or drag and drop it here. Then, press enter to continue",
+            default=str(cookies_path),
+            show_default=False,
+        )
+        cookies_path = Path(cookies_path_str.strip('"'))
     if read_urls_as_txt:
         _urls = []
         for url in urls:
