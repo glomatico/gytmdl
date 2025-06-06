@@ -11,11 +11,11 @@ import click
 import colorama
 
 from . import __version__
-from .constants import EXCLUDED_CONFIG_FILE_PARAMS, X_NOT_FOUND_STRING, PREMIUM_FORMATS
+from .constants import EXCLUDED_CONFIG_FILE_PARAMS, PREMIUM_FORMATS, X_NOT_FOUND_STRING
 from .custom_formatter import CustomFormatter
 from .downloader import Downloader
 from .enums import CoverFormat, DownloadMode
-from .utils import color_text
+from .utils import color_text, prompt_path
 
 downloader_sig = inspect.signature(Downloader.__init__)
 
@@ -269,14 +269,11 @@ def main(
     if download_mode == DownloadMode.ARIA2C and not shutil.which(aria2c_path):
         logger.critical(X_NOT_FOUND_STRING.format("aria2c", aria2c_path))
         return
-    while not cookies_path.exists():
-        cookies_path_str = click.prompt(
-            X_NOT_FOUND_STRING.format("Cookies file", cookies_path.absolute())
-            + ". Move it to that location or drag and drop it here. Then, press enter to continue",
-            default=str(cookies_path),
-            show_default=False,
+    if cookies_path is not None:
+        cookies_path = prompt_path(
+            True,
+            cookies_path,
         )
-        cookies_path = Path(cookies_path_str.strip('"'))
     if read_urls_as_txt:
         _urls = []
         for url in urls:
