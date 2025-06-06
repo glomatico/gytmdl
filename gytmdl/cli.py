@@ -17,6 +17,8 @@ from .downloader import Downloader
 from .enums import CoverFormat, DownloadMode
 from .utils import color_text, prompt_path
 
+logger = logging.getLogger("gytmdl")
+
 downloader_sig = inspect.signature(Downloader.__init__)
 
 
@@ -253,7 +255,6 @@ def main(
     no_config_file: bool,
 ):
     colorama.just_fix_windows_console()
-    logger = logging.getLogger(__name__)
     logger.setLevel(log_level)
     stream_handler = logging.StreamHandler()
     stream_handler.setFormatter(CustomFormatter())
