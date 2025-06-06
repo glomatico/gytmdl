@@ -22,7 +22,9 @@ def prompt_path(is_file: bool, initial_path: Path) -> Path:
         except click.BadParameter as e:
             path_str = click.prompt(
                 str(e)
-                + " Move it to that location, type the path or drag and drop it here. Then, press enter to continue"
+                + " Move it to that location, type the path or drag and drop it here. Then, press enter to continue",
+                default=str(initial_path),
+                show_default=False,
             )
             path_str = path_str.strip('"')
             initial_path = Path(path_str)
