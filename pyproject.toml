@@ -1,7 +1,7 @@
 [project]
 name = "gytmdl"
 description = "A Python CLI app for downloading YouTube Music songs with tags from YouTube Music"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 authors = [{ name = "glomatico" }]
 dependencies = [
     "click",
