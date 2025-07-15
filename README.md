@@ -1,10 +1,10 @@
-# Glomatico’s YouTube Music Downloader
+# Glomatico's YouTube Music Downloader
 A command-line app for downloading YouTube Music songs with tags from YouTube Music.
 
 **Discord Server:** https://discord.gg/aBjMEZ9tnq
 
 ## Features
-* **Precise metadata**: [YouTube Music API](https://github.com/sigma67/ytmusicapi) is used to get accurate metadata that yt-dlp alone can’t provide, like high-resolution square covers, lyrics, track numbers, and total track counts.
+* **Precise metadata**: [YouTube Music API](https://github.com/sigma67/ytmusicapi) is used to get accurate metadata that yt-dlp alone can't provide, like high-resolution square covers, lyrics, track numbers, and total track counts.
 * **Synced Lyrics**: Download synced lyrics in LRC.
 * **Artist Support**: Download all albums of an artist using their link.
 * **Highly Customizable**: Extensive configuration options for advanced users.
@@ -12,17 +12,17 @@ A command-line app for downloading YouTube Music songs with tags from YouTube Mu
 ## Prerequisites
 * **Python 3.10 or higher** installed on your system.
 * **FFmpeg** on your system PATH.
-    * **Windows**: Download from [AnimMouse’s FFmpeg Builds](https://github.com/AnimMouse/ffmpeg-stable-autobuild/releases).
-    * **Linux**: Download from [John Van Sickle’s FFmpeg Builds](https://johnvansickle.com/ffmpeg/).
+    * **Windows**: Download from [AnimMouse's FFmpeg Builds](https://github.com/AnimMouse/ffmpeg-stable-autobuild/releases).
+    * **Linux**: Download from [John Van Sickle's FFmpeg Builds](https://johnvansickle.com/ffmpeg/).
 * (Optional) The **cookies file** of your YouTube Music browser session in Netscape format (requires an active subscription).
     * **Firefox**: Use the [Export Cookies](https://addons.mozilla.org/addon/export-cookies-txt) extension.
     * **Chromium-based Browsers**: Use the [Open Cookies.txt](https://chromewebstore.google.com/detail/open-cookiestxt/gdocmgbfkjnnpapoeobnolbbkoibbcif) extension.
-    * With cookies, you can download **age-restricted content**, **private playlists**, and songs in **premium formats** if you have an active Premium subscription. You’ll have to set the cookies file path using the command line arguments or the config file (see [Configuration](#configuration)).
-    * **YouTube cookies can expire very quickly**. As a workaround, export your cookies in an incognito/anonymous window so they don’t expire as quickly.
+    * With cookies, you can download **age-restricted content**, **private playlists**, and songs in **premium formats** if you have an active Premium subscription. You'll have to set the cookies file path using the command line arguments or the config file (see [Configuration](#configuration)).
+    * **YouTube cookies can expire very quickly**. As a workaround, export your cookies in an incognito/anonymous window so they don't expire as quickly.
     *  **You may need to provide a PO token** by using the command line arguments or the config file if you encounter issues when downloading with cookies. To get a PO token, you can follow yt-dlp's instructions [here](https://github.com/yt-dlp/yt-dlp/wiki/PO-Token-Guide).
 
 ### Optional dependencies
-The following tools are optional but required for specific features. Add them to your system’s PATH or specify their paths using command-line arguments or the config file.
+The following tools are optional but required for specific features. Add them to your system's PATH or specify their paths using command-line arguments or the config file.
 * [aria2](https://aria2.github.io/): Required for `aria2c` download mode.
 
 ## Installation
