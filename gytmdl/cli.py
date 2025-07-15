@@ -12,7 +12,7 @@ import colorama
 
 from . import __version__
 from .constants import EXCLUDED_CONFIG_FILE_PARAMS, PREMIUM_FORMATS, X_NOT_FOUND_STRING
-from .custom_formatter import CustomFormatter
+from .custom_logger_formatter import CustomLoggerFormatter
 from .downloader import Downloader
 from .enums import CoverFormat, DownloadMode
 from .utils import color_text, prompt_path
@@ -255,7 +255,7 @@ def main(
     colorama.just_fix_windows_console()
     logger.setLevel(log_level)
     stream_handler = logging.StreamHandler()
-    stream_handler.setFormatter(CustomFormatter())
+    stream_handler.setFormatter(CustomLoggerFormatter())
     logger.addHandler(stream_handler)
     if itag in PREMIUM_FORMATS and cookies_path is None:
         logger.critical("Cookies file is required for premium formats")
