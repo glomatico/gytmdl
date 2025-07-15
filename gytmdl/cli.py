@@ -314,73 +314,73 @@ def main(
                 exc_info=not no_exceptions,
             )
             continue
-    for queue_index, queue_item in enumerate(download_queue, start=1):
-        queue_progress = color_text(
-            f"Track {queue_index}/{len(download_queue)} from URL {url_index}/{len(urls)}",
-            colorama.Style.DIM,
-        )
-        try:
-            logger.info(f'({queue_progress}) Downloading "{queue_item["title"]}"')
-            logger.debug("Getting tags")
-            ytmusic_watch_playlist = downloader.get_ytmusic_watch_playlist(
-                queue_item["id"]
+        for queue_index, queue_item in enumerate(download_queue, start=1):
+            queue_progress = color_text(
+                f"Track {queue_index}/{len(download_queue)} from URL {url_index}/{len(urls)}",
+                colorama.Style.DIM,
             )
-            if not ytmusic_watch_playlist:
-                logger.warning(
-                    f"({queue_progress}) Track doesn't have an album or is not available, skipping"
+            try:
+                logger.info(f'({queue_progress}) Downloading "{queue_item["title"]}"')
+                logger.debug("Getting tags")
+                ytmusic_watch_playlist = downloader.get_ytmusic_watch_playlist(
+                    queue_item["id"]
                 )
-                continue
-            tags = downloader.get_tags(ytmusic_watch_playlist)
-            final_path = downloader.get_final_path(tags)
-            synced_lyrics_path = downloader.get_synced_lyrics_path(final_path)
-            if synced_lyrics_only:
-                pass
-            elif final_path.exists() and not overwrite:
-                logger.warning(
-                    f'({queue_progress}) Track already exists at "{final_path}", skipping'
+                if not ytmusic_watch_playlist:
+                    logger.warning(
+                        f"({queue_progress}) Track doesn't have an album or is not available, skipping"
+                    )
+                    continue
+                tags = downloader.get_tags(ytmusic_watch_playlist)
+                final_path = downloader.get_final_path(tags)
+                synced_lyrics_path = downloader.get_synced_lyrics_path(final_path)
+                if synced_lyrics_only:
+                    pass
+                elif final_path.exists() and not overwrite:
+                    logger.warning(
+                        f'({queue_progress}) Track already exists at "{final_path}", skipping'
+                    )
+                else:
+                    video_id = ytmusic_watch_playlist["tracks"][0]["videoId"]
+                    track_temp_path = downloader.get_track_temp_path(video_id)
+                    remuxed_path = downloader.get_remuxed_path(video_id)
+                    cover_url = downloader.get_cover_url(ytmusic_watch_playlist)
+                    cover_file_extension = downloader.get_cover_file_extension(cover_url)
+                    cover_path = downloader.get_cover_path(final_path, cover_file_extension)
+                    logger.debug(f'Downloading to "{track_temp_path}"')
+                    downloader.download(video_id, track_temp_path)
+                    logger.debug(f'Remuxing to "{remuxed_path}"')
+                    downloader.remux(track_temp_path, remuxed_path)
+                    logger.debug("Applying tags")
+                    downloader.apply_tags(remuxed_path, tags, cover_url)
+                    logger.debug(f'Moving to "{final_path}"')
+                    downloader.move_to_output_path(remuxed_path, final_path)
+                if no_synced_lyrics or not tags.get("lyrics"):
+                    pass
+                elif synced_lyrics_path.exists() and not overwrite:
+                    logger.debug(
+                        f'Synced lyrics already exists at "{synced_lyrics_path}", skipping'
+                    )
+                else:
+                    logger.debug("Getting synced lyrics")
+                    synced_lyrics = downloader.get_synced_lyrics(ytmusic_watch_playlist)
+                    if synced_lyrics:
+                        logger.debug(f'Saving synced lyrics to "{synced_lyrics_path}"')
+                        downloader.save_synced_lyrics(synced_lyrics_path, synced_lyrics)
+                if not save_cover:
+                    pass
+                elif cover_path.exists() and not overwrite:
+                    logger.debug(f'Cover already exists at "{cover_path}", skipping')
+                else:
+                    logger.debug(f'Saving cover to "{cover_path}"')
+                    downloader.save_cover(cover_path, cover_url)
+            except Exception as e:
+                error_count += 1
+                logger.error(
+                    f'({queue_progress}) Failed to download "{queue_item["title"]}"',
+                    exc_info=not no_exceptions,
                 )
-            else:
-                video_id = ytmusic_watch_playlist["tracks"][0]["videoId"]
-                track_temp_path = downloader.get_track_temp_path(video_id)
-                remuxed_path = downloader.get_remuxed_path(video_id)
-                cover_url = downloader.get_cover_url(ytmusic_watch_playlist)
-                cover_file_extension = downloader.get_cover_file_extension(cover_url)
-                cover_path = downloader.get_cover_path(final_path, cover_file_extension)
-                logger.debug(f'Downloading to "{track_temp_path}"')
-                downloader.download(video_id, track_temp_path)
-                logger.debug(f'Remuxing to "{remuxed_path}"')
-                downloader.remux(track_temp_path, remuxed_path)
-                logger.debug("Applying tags")
-                downloader.apply_tags(remuxed_path, tags, cover_url)
-                logger.debug(f'Moving to "{final_path}"')
-                downloader.move_to_output_path(remuxed_path, final_path)
-            if no_synced_lyrics or not tags.get("lyrics"):
-                pass
-            elif synced_lyrics_path.exists() and not overwrite:
-                logger.debug(
-                    f'Synced lyrics already exists at "{synced_lyrics_path}", skipping'
-                )
-            else:
-                logger.debug("Getting synced lyrics")
-                synced_lyrics = downloader.get_synced_lyrics(ytmusic_watch_playlist)
-                if synced_lyrics:
-                    logger.debug(f'Saving synced lyrics to "{synced_lyrics_path}"')
-                    downloader.save_synced_lyrics(synced_lyrics_path, synced_lyrics)
-            if not save_cover:
-                pass
-            elif cover_path.exists() and not overwrite:
-                logger.debug(f'Cover already exists at "{cover_path}", skipping')
-            else:
-                logger.debug(f'Saving cover to "{cover_path}"')
-                downloader.save_cover(cover_path, cover_url)
-        except Exception as e:
-            error_count += 1
-            logger.error(
-                f'({queue_progress}) Failed to download "{queue_item["title"]}"',
-                exc_info=not no_exceptions,
-            )
-        finally:
-            if temp_path.exists():
-                logger.debug(f'Cleaning up "{temp_path}"')
-                downloader.cleanup_temp_path()
+            finally:
+                if temp_path.exists():
+                    logger.debug(f'Cleaning up "{temp_path}"')
+                    downloader.cleanup_temp_path()
     logger.info(f"Done ({error_count} error(s))")
