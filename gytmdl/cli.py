@@ -224,8 +224,6 @@ def load_config_file(
     callback=load_config_file,
     help="Don't load the config file.",
 )
-@click.version_option(__version__)
-@click.help_option("-h", "--help")
 def main(
     urls: tuple[str],
     save_cover: bool,
@@ -344,8 +342,12 @@ def main(
                     track_temp_path = downloader.get_track_temp_path(video_id)
                     remuxed_path = downloader.get_remuxed_path(video_id)
                     cover_url = downloader.get_cover_url(ytmusic_watch_playlist)
-                    cover_file_extension = downloader.get_cover_file_extension(cover_url)
-                    cover_path = downloader.get_cover_path(final_path, cover_file_extension)
+                    cover_file_extension = downloader.get_cover_file_extension(
+                        cover_url
+                    )
+                    cover_path = downloader.get_cover_path(
+                        final_path, cover_file_extension
+                    )
                     logger.debug(f'Downloading to "{track_temp_path}"')
                     downloader.download(video_id, track_temp_path)
                     logger.debug(f'Remuxing to "{remuxed_path}"')
