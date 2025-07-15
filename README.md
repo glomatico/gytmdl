@@ -1,5 +1,5 @@
 # Glomatico’s YouTube Music Downloader
-A Python CLI app for downloading YouTube Music songs with tags from YouTube Music.
+A command-line app for downloading YouTube Music songs with tags from YouTube Music.
 
 **Discord Server:** https://discord.gg/aBjMEZ9tnq
 
